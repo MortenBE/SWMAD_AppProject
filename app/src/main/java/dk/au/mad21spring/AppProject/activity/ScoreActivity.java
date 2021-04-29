@@ -1,14 +1,16 @@
-package dk.au.mad21spring.AppProject;
+package dk.au.mad21spring.AppProject.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import dk.au.mad21spring.AppProject.R;
+
+public class ScoreActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_score);
     }
 }
