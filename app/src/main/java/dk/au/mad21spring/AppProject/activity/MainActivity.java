@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ScoreButton.setOnClickListener(v -> {
             GoToScoreActivity();
         });
-
-
     }
 
     private void GoToScoreActivity() {
