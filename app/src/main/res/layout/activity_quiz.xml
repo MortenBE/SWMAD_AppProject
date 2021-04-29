@@ -6,14 +6,48 @@
     android:layout_height="match_parent"
     tools:context=".activity.QuizActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <RadioButton
+        android:id="@+id/quizButtonAns01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Quiz"
-        android:text="Quiz"
+        android:layout_marginBottom="350dp"
+        android:text="RadioButton"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/questionText"
+        app:layout_constraintTop_toBottomOf="@+id/questionText" />
+
+    <RadioButton
+        android:id="@+id/quizButtonAns02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RadioButton"
+        app:layout_constraintStart_toStartOf="@+id/quizButtonAns03"
+        app:layout_constraintTop_toBottomOf="@+id/quizButtonAns03" />
+
+    <RadioButton
+        android:id="@+id/quizButtonAns03"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RadioButton"
+        app:layout_constraintStart_toStartOf="@+id/quizButtonAns04"
+        app:layout_constraintTop_toBottomOf="@+id/quizButtonAns04" />
+
+    <RadioButton
+        android:id="@+id/quizButtonAns04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RadioButton"
+        app:layout_constraintStart_toStartOf="@+id/quizButtonAns01"
+        app:layout_constraintTop_toBottomOf="@+id/quizButtonAns01" />
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="260dp"
+        android:hint="Quiz question"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
