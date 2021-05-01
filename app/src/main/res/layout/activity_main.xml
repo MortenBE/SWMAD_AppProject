@@ -11,16 +11,18 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".activity.MainActivity"
-        tools:layout_editor_absoluteX="-29dp" />
+        tools:context=".activity.MainActivity" />
 
     <Button
         android:id="@+id/MainScoreButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginRight="50dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginRight="100dp"
         android:hint="Score"
         android:text="Score"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,8 +32,8 @@
         android:id="@+id/MainQuizButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginLeft="100dp"
         android:layout_marginBottom="25dp"
         android:hint="Quiz"
         android:text="Quiz"
