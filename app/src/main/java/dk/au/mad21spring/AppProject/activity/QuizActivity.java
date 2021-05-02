@@ -48,6 +48,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void getQuiz()
     {
+
         RequestQueue queue = Volley.newRequestQueue(getApplication().getApplicationContext());
 
         // Make request URL using parameters
