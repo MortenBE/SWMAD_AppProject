@@ -52,4 +52,29 @@
         android:hint="Quiz question"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/NameScoreQuiz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="50dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Submit score"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/RadioGroupQuiz" />
+
+    <Button
+        android:id="@+id/submitScoreBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="25dp"
+        android:text="Submit score"
+        app:layout_constraintStart_toStartOf="@+id/NameScoreQuiz"
+        app:layout_constraintTop_toBottomOf="@+id/NameScoreQuiz" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

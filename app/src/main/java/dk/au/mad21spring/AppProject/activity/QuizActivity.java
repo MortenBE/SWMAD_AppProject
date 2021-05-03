@@ -2,7 +2,13 @@ package dk.au.mad21spring.AppProject.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -29,6 +35,9 @@ public class QuizActivity extends AppCompatActivity {
     TextView Question;
     QuizAPI quizAPI;
     String correctAns;
+    Button submitBtn;
+    EditText nameInput;
+
     private int questionCounter, questionCountTotal;
     private QuizModel quiz;
     private int score;
@@ -42,16 +51,28 @@ public class QuizActivity extends AppCompatActivity {
         quizAPI = new QuizAPI(getApplication());
         setupWidgets();
         setupListener();
-
+        hideUI();
         getQuiz();
         score = 0;
 
 
     }
 
+    private void hideUI() {
+
+        submitBtn.setVisibility(View.GONE);
+        nameInput.setVisibility(View.GONE);
+    }
+
     private void setQuestion(int questionCounter) {
 
         String[] questionsArr = new String[4];
+
+        quiz01.setTextColor(Color.CYAN);
+        quiz02.setTextColor(Color.CYAN);
+        quiz03.setTextColor(Color.CYAN);
+        quiz04.setTextColor(Color.CYAN);
+
 
         questionsArr[0] = quiz.getResults().get(questionCounter).getCorrectAnswer();
         questionsArr[1] = quiz.getResults().get(questionCounter).getIncorrectAnswers().get(0);
@@ -73,33 +94,54 @@ public class QuizActivity extends AppCompatActivity {
     private void setupListener() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             checkResult(checkedId);
-
             nextQuestion();
         });
+        submitBtn.setOnClickListener(v -> {
+            Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
+            goToMapActivity();
+        });
+    }
+
+    private void goToMapActivity() {
+        Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+
+        try {
+            QuizActivity.this.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void nextQuestion() {
         if (questionCounter < questionCountTotal)
         {
-
             setQuestion(questionCounter);
             questionCounter ++;
         }
         else{
-            Toast.makeText(this, "Quiz done, you got: " + score + " out of 4 questions correct", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Quiz done, you got: " + score + " out of 4 questions correct, input name and submit score below", Toast.LENGTH_LONG).show();
+
+            submitBtn.setVisibility(View.VISIBLE);
+            nameInput.setVisibility(View.VISIBLE);
         }
     }
 
     private void checkResult(int Id) {
         RadioButton checkedButton = findViewById(Id);
 
+        checkedButton.setChecked(false);
         if ( checkedButton.getText() == quiz.getResults().get(questionCounter).getCorrectAnswer())
         {
             Toast.makeText(this, "Correct Answer", Toast.LENGTH_SHORT).show();
             score ++;
-        }
 
+        }
+        else {
+            Toast.makeText(this, "Wrong Answer, correct answer was: " + quiz.getResults().get(questionCounter).getCorrectAnswer(), Toast.LENGTH_LONG).show();
+        }
     }
+
+
 
 
     private void setupWidgets() {
@@ -109,6 +151,9 @@ public class QuizActivity extends AppCompatActivity {
         quiz04 = findViewById(R.id.quizButtonAns04);
         radioGroup = findViewById(R.id.RadioGroupQuiz);
         Question = findViewById(R.id.questionText);
+        submitBtn = findViewById(R.id.submitScoreBtn);
+        nameInput = findViewById(R.id.NameScoreQuiz);
+
 
         questionCounter = 0;
         questionCountTotal = 3;
