@@ -60,9 +60,11 @@ import android.widget.Toast;
 import android.location.Location;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.au.mad21spring.AppProject.R;
+import dk.au.mad21spring.AppProject.model.Quiz;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     //Widgets
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final int PERMISSIONS_REQUEST_LOCATION = 100;
     public static final int REQUEST_CHECK_SETTINGS = 501;
     private static final String TAG = "MapsActivity";
+
+    List<Quiz> quizzes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,16 +115,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Update UI with location data
                     if(myPosistionCircle == null)
                     {
+                        //Add circle to mark current position
                         myPosistionCircle = mMap.addCircle(new CircleOptions()
                                 .center(new LatLng(location.getLatitude(), location.getLongitude()))
-                                .radius(6)
+                                .radius(5)
                                 .strokeColor(Color.WHITE)
-                                .fillColor(Color.RED));
+                                .fillColor(Color.MAGENTA));
                     }
                     else {
+                        //Move circle to match current position
                         myPosistionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
 
+                    //Update current location and move camera postion and zoom
                     currentLocation = location;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
                 }
@@ -130,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());
             }
         };
-
     }
 
     @SuppressLint("MissingPermission")
@@ -190,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(MainActivity.this, "Location: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 
 
+
         /*
         if (fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -215,10 +222,43 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void conquerQuiz(){
+        //Check for nearby quiz
+        Quiz quiz = checkForNearbyQuiz();
 
+        if(quiz == null)
+        {
+            Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            //Take relevant information from quiz object
+            //Move to quiz activity
+            GoToQuizActivity();
 
+        }
+    }
 
+    private Quiz checkForNearbyQuiz(){
 
+        double distance;
+
+        for (int i = 0; i < quizzes.size(); i++)
+        {
+            //Distance from current location
+            distance = (currentLocation.getLatitude() - quizzes.get(i).getLatitude()) + (currentLocation.getLongitude() - quizzes.get(i).getLongitude());
+            Toast.makeText(this, "Distance: " + distance, Toast.LENGTH_SHORT).show();
+
+            //If ANY Quiz i close enough, return quiz
+            if(distance < 1)
+            {
+                return quizzes.get(i);
+            }
+        }
+
+        //If no quizzes are near return null
+        return null;
+    }
 
 
     private void initWigdets() {
@@ -227,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //setting up OnClickListeners
         QuizButton.setOnClickListener(v -> {
-            GoToQuizActivity();
+            conquerQuiz(); //GoToQuizActivity();
         });
         ScoreButton.setOnClickListener(v -> {
             GoToScoreActivity();
@@ -254,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Toast.makeText(this, "Quiz", Toast.LENGTH_SHORT).show();
         getLocation();
 
-
         Intent intent = new Intent(MainActivity.this, QuizActivity.class);
 
         try {
@@ -263,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
         }
 
-        
     }
 
     private void initMap() {
@@ -309,7 +347,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -333,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
         /*
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -341,29 +377,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
 
+        mMap.setMyLocationEnabled(true);
+
          */
-
-        //mMap.setMyLocationEnabled(true);
     }
-
 
     private void AddMapMarkers() {
-
-        LatLng aarhus = new LatLng(56.1692, 10.1998);
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions()
-                .title("Sidney")
-                .position(sydney)
-                .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24))
-        );
-        mMap.addMarker(new MarkerOptions()
-                .title("Aarhus")
-                .position(aarhus)
-                .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24))
-        );
+        mockGetQuizzes();
+        for (int i = 0; i< quizzes.size(); i ++)
+        {
+            mMap.addMarker(new MarkerOptions()
+                    .title(quizzes.get(i).getMockString())
+                    .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
+                    .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
+        }
     }
 
+    //TODO:Replace with a method for getting persisted quiz/location data
+    private void mockGetQuizzes()
+    {
+        Quiz q1 = new Quiz();
+        q1.setLatitude(56.1692);
+        q1.setLongitude(10.1998);
+        q1.setMockString("q1 in Aarhus");
 
+        Quiz q2 = new Quiz();
+        q2.setLatitude(56.1700);
+        q2.setLongitude(10.1992);
+        q2.setMockString("q2 in Aarhus");
+
+        quizzes.add(q1);
+        quizzes.add(q2);
+    }
 
     //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
@@ -387,35 +432,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // after generating our bitmap we are returning our bitmap.
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
-
-    /*
-
-    private class Quiz {
-        private double lat;
-        private double lon;
-
-        public double getLat()
-        {
-            return lat;
-        }
-
-        public double getLon()
-        {
-            return lon;
-        }
-
-        public void setLat(double lat)
-        {
-            this.lat = lat;
-        }
-
-        public void setLon(double lon)
-        {
-            this.lon = lon;
-        }
-    }
-
-     */
-
 }
 
