@@ -34,13 +34,14 @@ public class QuizActivity extends AppCompatActivity {
     RadioGroup radioGroup;
     TextView Question;
     QuizAPI quizAPI;
-    String correctAns;
     Button submitBtn;
     EditText nameInput;
 
     private int questionCounter, questionCountTotal;
     private QuizModel quiz;
     private int score;
+    private String difficultly;
+    private String category;
 
 
     @Override
@@ -52,10 +53,10 @@ public class QuizActivity extends AppCompatActivity {
         setupWidgets();
         setupListener();
         hideUI();
+        difficultly = "medium";
+        category = "25";
         getQuiz();
         score = 0;
-
-
     }
 
     private void hideUI() {
@@ -97,9 +98,16 @@ public class QuizActivity extends AppCompatActivity {
             nextQuestion();
         });
         submitBtn.setOnClickListener(v -> {
-            Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
+            postScore();
             goToMapActivity();
         });
+    }
+
+    private void postScore() {
+
+        // IMPLEMENT PERSISTANCE OF SCORE & NAME TO DB
+
+        Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
     }
 
     private void goToMapActivity() {
@@ -167,7 +175,10 @@ public class QuizActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(getApplication().getApplicationContext());
 
         // Make request URL using parameters
-        String url ="https://opentdb.com/api.php?amount=4&difficulty=medium&type=multiple";
+        String amountOfQuestions = "amount=4";
+
+
+        String url ="https://opentdb.com/api.php?"+ amountOfQuestions + "&category=" + category + "&difficulty=" + difficultly + "&type=multiple";
         // Making GET request for weather model request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 response -> {
@@ -175,7 +186,8 @@ public class QuizActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     quiz = gson.fromJson(response, QuizModel.class);
                     setQuestion(questionCounter);
-                   // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
+
+                    // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                 },
                 error -> Toast.makeText(getApplication().getApplicationContext(), "Error while fetching quiz" + error.getMessage(),  Toast.LENGTH_SHORT).show());
         queue.add(stringRequest);
