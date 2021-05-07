@@ -4,23 +4,46 @@ package dk.au.mad21spring.AppProject.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.Manifest;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.text.Transliterator;
+import android.location.Location;
 import android.os.Bundle;
 
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,81 +52,183 @@ import androidx.core.content.ContextCompat;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.location.Location;
+
+
+import java.util.List;
 
 import dk.au.mad21spring.AppProject.R;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+    //Widgets
     private Button QuizButton, ScoreButton;
     private GoogleMap mMap;
 
+    //For location tracking
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private Location lastLocation = null;
+    Circle myPosistionCircle;
+    Location currentLocation;
+
+
+    //Variables
     private boolean permissionGranted;
     public static final int PERMISSIONS_REQUEST_LOCATION = 100;
+    public static final int REQUEST_CHECK_SETTINGS = 501;
+    private static final String TAG = "MapsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        initWigdet();
-        initButtons();
-
+        initWigdets();
         checkLocationPermission();
-        setCurrentLocation();
+        //initLocationFramework();
+        initMap();
 
+        initLocationTracking();
+        startLocationTracking();
     }
 
-    private void setCurrentLocation() {
-    }
+    private void initLocationTracking() {
+        //Make a location request
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-    //https://developer.android.com/training/permissions/requesting.html
-    private void checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_LOCATION);
-        }
-    }
-
-    //mhttps://developer.android.com/training/permissions/requesting.html
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    // got permission
-
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
                 }
-                else {
-                    // permission denied
-                    Toast.makeText(this, "You need to enable permission for Location to use the app", Toast.LENGTH_SHORT).show();
-                    finish();
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    if(myPosistionCircle == null)
+                    {
+                        myPosistionCircle = mMap.addCircle(new CircleOptions()
+                                .center(new LatLng(location.getLatitude(), location.getLongitude()))
+                                .radius(6)
+                                .strokeColor(Color.WHITE)
+                                .fillColor(Color.RED));
+                    }
+                    else {
+                        myPosistionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
+                    }
+
+                    currentLocation = location;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
                 }
-                return;
             }
-        }
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());
+            }
+        };
+
     }
 
-    private void initWigdet() {
+    @SuppressLint("MissingPermission")
+    private void startLocationTracking() {
+        //https://developer.android.com/training/location/change-location-settings
+        //Setting up location request
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(2 * 1000); //The interval should be low for best user experience
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        //Add location settings to location settings
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+        //Check whether the current location settings are satisfied
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        //Determine whether the location settings are appropriate for the location request
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+            }
+        });
+
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(MainActivity.this,
+                                REQUEST_CHECK_SETTINGS);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
+
+
+        //Make a location request
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
+    }
+
+
+    private void getLocation() {
+        Toast.makeText(MainActivity.this, "Location: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+
+        /*
+        if (fusedLocationClient == null) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            Toast.makeText(MainActivity.this, "Location latitude: " + location.getLatitude() + "Location longitude: " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+         */
+
+
+    }
+
+
+
+
+
+
+
+    private void initWigdets() {
         QuizButton = findViewById(R.id.MainQuizButton);
         ScoreButton = findViewById(R.id.MainScoreButton);
-    }
 
-    private void initButtons() {
+        //setting up OnClickListeners
         QuizButton.setOnClickListener(v -> {
             GoToQuizActivity();
         });
-
         ScoreButton.setOnClickListener(v -> {
             GoToScoreActivity();
         });
@@ -111,7 +236,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void GoToScoreActivity() {
         Toast.makeText(this, "Score", Toast.LENGTH_SHORT).show();
+        //getLocation();
 
+        /*
         Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
 
         try {
@@ -119,10 +246,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
         }
+
+         */
     }
 
     private void GoToQuizActivity() {
-        Toast.makeText(this, "Quiz", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Quiz", Toast.LENGTH_SHORT).show();
+        getLocation();
+
 
         Intent intent = new Intent(MainActivity.this, QuizActivity.class);
 
@@ -131,7 +262,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
         }
+
+        
     }
+
+    private void initMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        //currentLocationMarker = makeMarkerIcon(R.drawable.ic_baseline_grade_24, 100, 80);
+    }
+
+    ////Check Location permission
+    //https://developer.android.com/training/permissions/requesting.html
+    private void checkLocationPermission() {
+        //Check if permission has been granted:
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            //Request permission
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+        }
+        else
+        {
+            Toast.makeText(this, "Permission has been granted", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    // got permission
+                    // Continue worklflow
+                }
+                else {
+                    // permission denied
+                    finish();
+                }
+                return;
+            }
+        }
+    }
+
 
 
     @Override
@@ -158,18 +334,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
+        /*
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             return;
         }
 
-        mMap.setMyLocationEnabled(true);
+         */
+
+        //mMap.setMyLocationEnabled(true);
     }
+
 
     private void AddMapMarkers() {
 
-        LatLng aarhus = new LatLng(56.15, 10.30);
+        LatLng aarhus = new LatLng(56.1692, 10.1998);
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions()
                 .title("Sidney")
@@ -182,6 +362,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24))
         );
     }
+
+
 
     //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
@@ -206,4 +388,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    /*
+
+    private class Quiz {
+        private double lat;
+        private double lon;
+
+        public double getLat()
+        {
+            return lat;
+        }
+
+        public double getLon()
+        {
+            return lon;
+        }
+
+        public void setLat(double lat)
+        {
+            this.lat = lat;
+        }
+
+        public void setLon(double lon)
+        {
+            this.lon = lon;
+        }
+    }
+
+     */
+
 }
+

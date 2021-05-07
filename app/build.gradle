@@ -39,6 +39,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation "com.google.android.gms:play-services-location:18.0.0"
 
     implementation platform('com.google.firebase:firebase-bom:27.1.0') //BoM = Bill of Materials used to declare dependencies to Firebase Libararies: https://firebase.google.com/docs/android/learn-more#bom
 
