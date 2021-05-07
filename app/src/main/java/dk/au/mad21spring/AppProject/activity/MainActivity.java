@@ -68,7 +68,7 @@ import dk.au.mad21spring.AppProject.model.Quiz;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     //Widgets
-    private Button QuizButton, ScoreButton;
+    private Button QuizButton;
     private GoogleMap mMap;
 
     //For location tracking
@@ -183,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
         //Make a location request
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.requestLocationUpdates(locationRequest,
@@ -263,14 +262,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void initWigdets() {
         QuizButton = findViewById(R.id.MainQuizButton);
-        ScoreButton = findViewById(R.id.MainScoreButton);
 
         //setting up OnClickListeners
         QuizButton.setOnClickListener(v -> {
             conquerQuiz(); //GoToQuizActivity();
-        });
-        ScoreButton.setOnClickListener(v -> {
-            GoToScoreActivity();
         });
     }
 
@@ -292,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void GoToQuizActivity() {
         //Toast.makeText(this, "Quiz", Toast.LENGTH_SHORT).show();
-        getLocation();
+        //getLocation();
 
         Intent intent = new Intent(MainActivity.this, QuizActivity.class);
 
@@ -301,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void initMap() {
@@ -323,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else
         {
-            Toast.makeText(this, "Permission has been granted", Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -345,7 +339,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
