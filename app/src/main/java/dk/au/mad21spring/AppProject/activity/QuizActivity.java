@@ -1,5 +1,6 @@
 package dk.au.mad21spring.AppProject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ActivityNotFoundException;
@@ -18,6 +19,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
@@ -27,6 +33,7 @@ import java.util.List;
 import dk.au.mad21spring.AppProject.API.QuizAPI;
 import dk.au.mad21spring.AppProject.API.QuizModel;
 import dk.au.mad21spring.AppProject.R;
+import dk.au.mad21spring.AppProject.database.QuizRepository;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -39,9 +46,12 @@ public class QuizActivity extends AppCompatActivity {
 
     private int questionCounter, questionCountTotal;
     private QuizModel quiz;
-    private int score;
+    private int score, newScore;
+    private String name;
     private String difficultly;
     private String category;
+
+    private FirebaseFirestore db;
 
 
     @Override
@@ -57,6 +67,8 @@ public class QuizActivity extends AppCompatActivity {
         category = "25";
         getQuiz();
         score = 0;
+
+        db = FirebaseFirestore.getInstance();
     }
 
     private void hideUI() {
@@ -69,10 +81,10 @@ public class QuizActivity extends AppCompatActivity {
 
         String[] questionsArr = new String[4];
 
-        quiz01.setTextColor(Color.CYAN);
-        quiz02.setTextColor(Color.CYAN);
-        quiz03.setTextColor(Color.CYAN);
-        quiz04.setTextColor(Color.CYAN);
+        quiz01.setTextColor(Color.BLACK);
+        quiz02.setTextColor(Color.BLACK);
+        quiz03.setTextColor(Color.BLACK);
+        quiz04.setTextColor(Color.BLACK);
 
 
         questionsArr[0] = quiz.getResults().get(questionCounter).getCorrectAnswer();
@@ -98,6 +110,7 @@ public class QuizActivity extends AppCompatActivity {
             nextQuestion();
         });
         submitBtn.setOnClickListener(v -> {
+            name = nameInput.getText().toString();
             postScore();
             goToMapActivity();
         });
@@ -106,8 +119,28 @@ public class QuizActivity extends AppCompatActivity {
     private void postScore() {
 
         // IMPLEMENT PERSISTANCE OF SCORE & NAME TO DB
-
         Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
+        addDataToFirestore(name, score);
+
+    }
+
+    //based on https://www.geeksforgeeks.org/how-to-update-data-in-firebase-firestore-in-android/
+    private void addDataToFirestore(String name, int score) {
+        //collection reference for database
+        CollectionReference dbQuizResult = db.collection("Scores");
+
+        QuizRepository quizData = new QuizRepository(name, score);
+        dbQuizResult.add(quizData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(QuizActivity.this, "Results has been added", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(QuizActivity.this, "Failed to add Quiz Results", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void goToMapActivity() {
