@@ -93,9 +93,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         initWigdets();
-        checkLocationPermission();
+
         //initLocationFramework();
+
+
+        checkLocationPermission();
+
         initMap();
+
+
 
         initLocationTracking();
         startLocationTracking();
@@ -113,25 +119,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
-                    if(myPosistionCircle == null)
-                    {
+                    if (myPosistionCircle == null) {
                         //Add circle to mark current position
                         myPosistionCircle = mMap.addCircle(new CircleOptions()
                                 .center(new LatLng(location.getLatitude(), location.getLongitude()))
                                 .radius(5)
                                 .strokeColor(Color.WHITE)
                                 .fillColor(Color.MAGENTA));
-                    }
-                    else {
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
+                    } else {
                         //Move circle to match current position
                         myPosistionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
 
                     //Update current location and move camera postion and zoom
                     currentLocation = location;
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
+
                 }
             }
+
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());
@@ -188,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());
+
+
     }
 
 
@@ -221,16 +230,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void conquerQuiz(){
+    private void conquerQuiz() {
         //Check for nearby quiz
         Quiz quiz = checkForNearbyQuiz();
 
-        if(quiz == null)
-        {
+        if (quiz == null) {
             Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
+        } else {
             //Take relevant information from quiz object
             //Move to quiz activity
             GoToQuizActivity();
@@ -238,25 +244,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private Quiz checkForNearbyQuiz(){
+    private Quiz checkForNearbyQuiz() {
 
         double distance;
 
-        for (int i = 0; i < quizzes.size(); i++)
-        {
+        for (int i = 0; i < quizzes.size(); i++) {
             //Distance from current location
-            distance = (currentLocation.getLatitude() - quizzes.get(i).getLatitude()) + (currentLocation.getLongitude() - quizzes.get(i).getLongitude());
-            Toast.makeText(this, "Distance: " + distance, Toast.LENGTH_SHORT).show();
+            distance = calculateDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude());
+
+            Toast.makeText(this, "Distance: " + distance + "m", Toast.LENGTH_SHORT).show();
 
             //If ANY Quiz i close enough, return quiz
-            if(distance < 1)
-            {
+            if (distance < 10) {
                 return quizzes.get(i);
             }
         }
 
         //If no quizzes are near return null
         return null;
+    }
+
+    //https://www.geodatasource.com/developers/java
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+        dist = Math.acos(dist);
+        dist = Math.toDegrees(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344 * 1000; //Distance in meters
+
+        return (dist);
     }
 
 
@@ -310,24 +327,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //https://developer.android.com/training/permissions/requesting.html
     private void checkLocationPermission() {
         //Check if permission has been granted:
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //Request permission
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
-        }
-        else
-        {
+            //mMap.setMyLocationEnabled(true);
+        } else {
 
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // got permission
                     // Continue worklflow
                 }
@@ -340,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -363,16 +377,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        /*
+
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             return;
         }
-
         mMap.setMyLocationEnabled(true);
 
-         */
+
     }
 
     private void AddMapMarkers() {
