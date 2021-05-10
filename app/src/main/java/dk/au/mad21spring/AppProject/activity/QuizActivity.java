@@ -154,15 +154,11 @@ public class QuizActivity extends AppCompatActivity {
         {
             Toast.makeText(this, "Correct Answer", Toast.LENGTH_SHORT).show();
             score ++;
-
         }
         else {
             Toast.makeText(this, "Wrong Answer, correct answer was: " + quiz.getResults().get(questionCounter).getCorrectAnswer(), Toast.LENGTH_LONG).show();
         }
     }
-
-
-
 
     private void setupWidgets() {
         quiz01 = findViewById(R.id.quizButtonAns01);
