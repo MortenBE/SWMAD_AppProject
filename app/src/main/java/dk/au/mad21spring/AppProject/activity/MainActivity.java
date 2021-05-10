@@ -89,7 +89,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //setting up OnClickListeners
         QuizButton.setOnClickListener(v -> {
-            ConquerQuiz(); //GoToQuizActivity();
+            if(currentLocation != null)
+            {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 18));
+            }
+            ConquerQuiz();
         });
     }
 
