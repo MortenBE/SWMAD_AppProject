@@ -2,6 +2,7 @@ package dk.au.mad21spring.AppProject.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -24,8 +25,10 @@ import dk.au.mad21spring.AppProject.viewmodel.ScoreViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
     private static final String TAG = "ScoreActivity";
+
     ScoreViewModel scoreViewModel;
-    ListView highscores;
+
+    private List<Score> highscores = new ArrayList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +36,19 @@ public class ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_score);
 
         scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
-
-        ArrayList<Score> listOfScores = scoreViewModel.getAllScores();
-        if(listOfScores == null) {
-            Toast.makeText(this, "There is nothing here", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "" + listOfScores.size(), Toast.LENGTH_SHORT).show();
+        scoreViewModel.getAllScores().observe(this, new Observer<List<Score>>(){
+            @Override
+            public void onChanged(List<Score> scores) {
+                highscores = scores;
+                updateUI();
+            }
+        });
+    }
+    private void updateUI() {
+        for(int i = 0; i < highscores.size(); i++)
+        {
+            Toast.makeText(this, "" + highscores.get(i).name, Toast.LENGTH_SHORT).show();
         }
-
     }
 
 }

@@ -1,5 +1,6 @@
 package dk.au.mad21spring.AppProject.database;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ public class Repository {
 
     public ArrayList<Score> getScores() {
         return instance.getScoreFromFirestore();
+    }
 
+    public CollectionReference getScoresCollectionReference() {
+        return instance.getScoresCollectionReference();
     }
 }
