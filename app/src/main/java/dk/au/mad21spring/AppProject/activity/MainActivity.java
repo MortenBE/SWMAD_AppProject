@@ -12,9 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.Transliterator;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -27,9 +25,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,19 +41,15 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.location.Location;
 
 
 import java.util.ArrayList;
@@ -67,25 +59,20 @@ import dk.au.mad21spring.AppProject.R;
 import dk.au.mad21spring.AppProject.model.Quiz;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-    //Widgets
+
     private Button QuizButton;
     private GoogleMap mMap;
 
-    //For location tracking
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-    private Location lastLocation = null;
-    Circle myPosistionCircle;
+    Circle myPositionCircle;
     Location currentLocation;
 
-
-    //Variables
-    private boolean permissionGranted;
-    public static final int PERMISSIONS_REQUEST_LOCATION = 100;
-    public static final int REQUEST_CHECK_SETTINGS = 501;
+    public static final int PERMISSIONS_REQUEST_LOCATION = 101;
+    public static final int REQUEST_CHECK_SETTINGS = 201;
     private static final String TAG = "MapsActivity";
 
-    List<Quiz> quizzes = new ArrayList<>();
+    List<Quiz> quizzes = new ArrayList<>(); //Should be live data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,20 +80,105 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         initWigdets();
+        initLocationTracking();
+        initMap();
+    }
 
-        //initLocationFramework();
+    private void initWigdets() {
+        QuizButton = findViewById(R.id.MainQuizButton);
 
+        //setting up OnClickListeners
+        QuizButton.setOnClickListener(v -> {
+            ConquerQuiz(); //GoToQuizActivity();
+        });
+    }
+
+    ////Map
+    private void initMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
         checkLocationPermission();
 
-        initMap();
+        AddMapMarkers();
 
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Toast.makeText(MainActivity.this, "HEY" + marker.getTitle(), Toast.LENGTH_SHORT).show();
 
+                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
 
-        initLocationTracking();
-        startLocationTracking();
+                try {
+                    MainActivity.this.startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
+                }
+
+                return false;
+            }
+        });
     }
 
+    private void AddMapMarkers() {
+        mockGetQuizzes();
+        for (int i = 0; i< quizzes.size(); i ++)
+        {
+            mMap.addMarker(new MarkerOptions()
+                    .title(quizzes.get(i).getMockString())
+                    .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
+                    .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
+        }
+    }
+
+    //TODO:Replace with a method for getting persisted quiz/location data
+    private void mockGetQuizzes()
+    {
+        Quiz q1 = new Quiz();
+        q1.setLatitude(56.1692);
+        q1.setLongitude(10.1998);
+        q1.setMockString("q1 in Aarhus");
+
+        Quiz q2 = new Quiz();
+        q2.setLatitude(56.1700);
+        q2.setLongitude(10.1992);
+        q2.setMockString("q2 in Aarhus");
+
+        quizzes.add(q1);
+        quizzes.add(q2);
+    }
+
+    //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
+    private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
+        // below line is use to generate a drawable.
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+
+        // below line is use to set bounds to our vector drawable.
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+
+        // below line is use to create a bitmap for our
+        // drawable which we have added.
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+        // below line is use to add bitmap in our canvas.
+        Canvas canvas = new Canvas(bitmap);
+
+        // below line is use to draw our
+        // vector drawable in canvas.
+        vectorDrawable.draw(canvas);
+
+        // after generating our bitmap we are returning our bitmap.
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+
+    ////Location tracking
     private void initLocationTracking() {
         //Make a location request
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -119,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
-                    if (myPosistionCircle == null) {
+                    if (myPositionCircle == null) {
                         //Add circle to mark current position
-                        myPosistionCircle = mMap.addCircle(new CircleOptions()
+                        myPositionCircle = mMap.addCircle(new CircleOptions()
                                 .center(new LatLng(location.getLatitude(), location.getLongitude()))
                                 .radius(5)
                                 .strokeColor(Color.WHITE)
@@ -130,12 +202,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
                     } else {
                         //Move circle to match current position
-                        myPosistionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
+                        myPositionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
 
                     //Update current location and move camera postion and zoom
                     currentLocation = location;
-
                 }
             }
 
@@ -199,13 +270,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
+    //Finds current locations once
     private void getLocation() {
-        Toast.makeText(MainActivity.this, "Location: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-
-
-
-        /*
         if (fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
@@ -224,15 +290,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
-
-         */
-
-
     }
 
-    private void conquerQuiz() {
+    ////Quiz
+    private void ConquerQuiz() {
         //Check for nearby quiz
-        Quiz quiz = checkForNearbyQuiz();
+        Quiz quiz = FindNearbyQuiz();
 
         if (quiz == null) {
             Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
@@ -240,12 +303,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Take relevant information from quiz object
             //Move to quiz activity
             GoToQuizActivity();
-
         }
     }
 
-    private Quiz checkForNearbyQuiz() {
-
+    private Quiz FindNearbyQuiz() {
         double distance;
 
         for (int i = 0; i < quizzes.size(); i++) {
@@ -265,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //https://www.geodatasource.com/developers/java
+    ////Gets two coordinates calculates the distance between i meters
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
@@ -276,36 +338,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return (dist);
     }
 
-
-    private void initWigdets() {
-        QuizButton = findViewById(R.id.MainQuizButton);
-
-        //setting up OnClickListeners
-        QuizButton.setOnClickListener(v -> {
-            conquerQuiz(); //GoToQuizActivity();
-        });
-    }
-
-    private void GoToScoreActivity() {
-        Toast.makeText(this, "Score", Toast.LENGTH_SHORT).show();
-        //getLocation();
-
-        /*
-        Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
-
-        try {
-            MainActivity.this.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
-        }
-
-         */
-    }
-
     private void GoToQuizActivity() {
-        //Toast.makeText(this, "Quiz", Toast.LENGTH_SHORT).show();
-        //getLocation();
-
         Intent intent = new Intent(MainActivity.this, QuizActivity.class);
 
         try {
@@ -315,14 +348,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void initMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        //currentLocationMarker = makeMarkerIcon(R.drawable.ic_baseline_grade_24, 100, 80);
-    }
-
     ////Check Location permission
     //https://developer.android.com/training/permissions/requesting.html
     private void checkLocationPermission() {
@@ -330,9 +355,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //Request permission
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
-            //mMap.setMyLocationEnabled(true);
         } else {
-
+            startLocationTracking();
         }
     }
 
@@ -342,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case PERMISSIONS_REQUEST_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // got permission
-                    // Continue worklflow
+                    startLocationTracking();
                 }
                 else {
                     // permission denied
@@ -351,93 +375,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
         }
-    }
-
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        AddMapMarkers();
-
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Toast.makeText(MainActivity.this, "HEY" + marker.getTitle(), Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
-
-                try {
-                    MainActivity.this.startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
-                }
-
-                return false;
-            }
-        });
-
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            return;
-        }
-        mMap.setMyLocationEnabled(true);
-
-
-    }
-
-    private void AddMapMarkers() {
-        mockGetQuizzes();
-        for (int i = 0; i< quizzes.size(); i ++)
-        {
-            mMap.addMarker(new MarkerOptions()
-                    .title(quizzes.get(i).getMockString())
-                    .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
-                    .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
-        }
-    }
-
-    //TODO:Replace with a method for getting persisted quiz/location data
-    private void mockGetQuizzes()
-    {
-        Quiz q1 = new Quiz();
-        q1.setLatitude(56.1692);
-        q1.setLongitude(10.1998);
-        q1.setMockString("q1 in Aarhus");
-
-        Quiz q2 = new Quiz();
-        q2.setLatitude(56.1700);
-        q2.setLongitude(10.1992);
-        q2.setMockString("q2 in Aarhus");
-
-        quizzes.add(q1);
-        quizzes.add(q2);
-    }
-
-    //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
-    private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
-        // below line is use to generate a drawable.
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-
-        // below line is use to set bounds to our vector drawable.
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-
-        // below line is use to create a bitmap for our
-        // drawable which we have added.
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-
-        // below line is use to add bitmap in our canvas.
-        Canvas canvas = new Canvas(bitmap);
-
-        // below line is use to draw our
-        // vector drawable in canvas.
-        vectorDrawable.draw(canvas);
-
-        // after generating our bitmap we are returning our bitmap.
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }
 
