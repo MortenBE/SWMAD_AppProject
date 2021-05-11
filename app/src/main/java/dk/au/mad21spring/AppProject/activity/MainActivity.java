@@ -43,6 +43,7 @@ import com.google.android.gms.tasks.Task;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -57,27 +58,47 @@ import java.util.List;
 
 import dk.au.mad21spring.AppProject.R;
 import dk.au.mad21spring.AppProject.model.Quiz;
+import dk.au.mad21spring.AppProject.model.Score;
+import dk.au.mad21spring.AppProject.viewmodel.MapViewModel;
+import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private Button QuizButton;
     private GoogleMap mMap;
+    private List<Quiz> quizzes = new ArrayList();
+
+    MapViewModel mapViewModel;
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     Circle myPositionCircle;
     Location currentLocation;
 
+
+
     public static final int PERMISSIONS_REQUEST_LOCATION = 101;
     public static final int REQUEST_CHECK_SETTINGS = 201;
     private static final String TAG = "MapsActivity";
 
-    List<Quiz> quizzes = new ArrayList<>(); //Should be live data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        GetQuizzes();
+
+        mapViewModel.getQuizes().observe(this, q -> {
+            quizzes = q;
+            AddMapMarkers();
+        });
+        // Only first time this should be called.
+        //addQuizes();
+
+        GetQuizzes();
+
 
         initWigdets();
         initLocationTracking();
@@ -112,26 +133,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         AddMapMarkers();
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Toast.makeText(MainActivity.this, "HEY" + marker.getTitle(), Toast.LENGTH_SHORT).show();
+        mMap.setOnMarkerClickListener(marker -> {
+            Toast.makeText(MainActivity.this, "HEY" + marker.getTitle(), Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+            Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
 
-                try {
-                    MainActivity.this.startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
-                }
-
-                return false;
+            try {
+                MainActivity.this.startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
             }
+
+            return false;
         });
     }
 
     private void AddMapMarkers() {
-        mockGetQuizzes();
         for (int i = 0; i< quizzes.size(); i ++)
         {
             mMap.addMarker(new MarkerOptions()
@@ -142,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //TODO:Replace with a method for getting persisted quiz/location data
-    private void mockGetQuizzes()
+    /*private void mockGetQuizzes()
     {
         Quiz q1 = new Quiz();
         q1.setLatitude(56.1692);
@@ -156,6 +173,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         quizzes.add(q1);
         quizzes.add(q2);
+    }*/
+
+    private void addQuizes()
+    {
+        Quiz q1 = new Quiz();
+        q1.setLatitude(56.1692);
+        q1.setLongitude(10.1998);
+        q1.setMockString("q1 in Aarhus");
+        q1.setCategory("24");
+        q1.setDifficulity("medium");
+
+        Quiz q2 = new Quiz();
+        q2.setLatitude(56.1700);
+        q2.setLongitude(10.1992);
+        q2.setMockString("q2 in Aarhus");
+        q2.setCategory("26");
+        q2.setDifficulity("medium");
+
+        mapViewModel.addQuiz(q1);
+        mapViewModel.addQuiz(q2);
+    }
+
+    private void GetQuizzes()
+    {
+        mapViewModel.getQuizes();
     }
 
     //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/

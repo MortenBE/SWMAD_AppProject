@@ -127,7 +127,6 @@ public class QuizActivity extends AppCompatActivity {
             }
             else
             {
-
                 Toast.makeText(this, "Please write a name, and try agian", Toast.LENGTH_SHORT).show();
             }
         });
