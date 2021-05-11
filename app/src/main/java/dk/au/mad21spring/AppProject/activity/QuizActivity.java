@@ -69,8 +69,14 @@ public class QuizActivity extends AppCompatActivity {
 
     private void hideUI() {
 
+
         submitBtn.setVisibility(View.GONE);
         nameInput.setVisibility(View.GONE);
+        quiz01.setVisibility(View.GONE);
+        quiz02.setVisibility(View.GONE);
+        quiz03.setVisibility(View.GONE);
+        quiz04.setVisibility(View.GONE);
+        Question.setVisibility(View.GONE);
     }
 
     private void setQuestion(int questionCounter) {
@@ -94,10 +100,10 @@ public class QuizActivity extends AppCompatActivity {
 
 
         Question.setText(quiz.getResults().get(questionCounter).getQuestion().replace("&amp;", "&").replace("&quot;", "\""));
-        quiz01.setText(questionsArr[0]);
-        quiz02.setText(questionsArr[1]);
-        quiz03.setText(questionsArr[2]);
-        quiz04.setText(questionsArr[3]);
+        quiz01.setText(questionsArr[0].replace("&amp;", "&").replace("&quot;", "\""));
+        quiz02.setText(questionsArr[1].replace("&amp;", "&").replace("&quot;", "\""));
+        quiz03.setText(questionsArr[2].replace("&amp;", "&").replace("&quot;", "\""));
+        quiz04.setText(questionsArr[3].replace("&amp;", "&").replace("&quot;", "\""));
     }
 
     private void setupListener() {
@@ -194,11 +200,15 @@ public class QuizActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     quiz = gson.fromJson(response, QuizModel.class);
                     setQuestion(questionCounter);
+                    quiz01.setVisibility(View.VISIBLE);
+                    quiz02.setVisibility(View.VISIBLE);
+                    quiz03.setVisibility(View.VISIBLE);
+                    quiz04.setVisibility(View.VISIBLE);
+                    Question.setVisibility(View.VISIBLE);
 
                     // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                 },
                 error -> Toast.makeText(getApplication().getApplicationContext(), "Error while fetching quiz" + error.getMessage(),  Toast.LENGTH_SHORT).show());
         queue.add(stringRequest);
     }
-
 }
