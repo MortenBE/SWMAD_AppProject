@@ -37,26 +37,18 @@ public class ScoreViewModel extends AndroidViewModel {
 
     private void ObserveScores(){
         ArrayList<Score> arrayList = new ArrayList<>();
-        db.collection("Scores").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if(!queryDocumentSnapshots.isEmpty()) {
-                    List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
-                    for (DocumentSnapshot d : list) {
-                        Score newScore = d.toObject(Score.class);
-                        arrayList.add(newScore);
-                    }
-                    scores.setValue(arrayList);
-                } else {
-                    Log.d(TAG, "No data found in database");
+        db.collection("Scores").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if(!queryDocumentSnapshots.isEmpty()) {
+                List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+                for (DocumentSnapshot d : list) {
+                    Score newScore = d.toObject(Score.class);
+                    arrayList.add(newScore);
                 }
+                scores.setValue(arrayList);
+            } else {
+                Log.d(TAG, "No data found in database");
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "A Failure has occurred with Firestore");
-            }
-        });
+        }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
     }
 
     public LiveData<List<Score>> getAllScores(){

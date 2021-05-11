@@ -49,12 +49,7 @@ public class MapViewModel extends AndroidViewModel {
             } else {
                 Log.d(TAG, "No data found in database");
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "A Failure has occurred with Firestore");
-            }
-        });
+        }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
     }
 
     public MutableLiveData<List<Quiz>> getQuizes(){

@@ -113,7 +113,7 @@ public class QuizActivity extends AppCompatActivity {
         quiz02.setText(questionsArr[1]);
         quiz03.setText(questionsArr[2]);
         quiz04.setText(questionsArr[3]);
-    }//.replace("&amp;", "&").replace("&quot;", "\"").replace("&#039;","'").replace("&ldquo;","\"").replace("&rdquo;","\""));
+    }
 
     private void setupListener() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
