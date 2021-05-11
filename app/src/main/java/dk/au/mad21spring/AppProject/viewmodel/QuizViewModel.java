@@ -11,8 +11,6 @@ import dk.au.mad21spring.AppProject.model.Score;
 public class QuizViewModel extends AndroidViewModel {
     private final Repository instance;
 
-
-
     public QuizViewModel(@NonNull Application application) {
         super(application);
         instance = new Repository();

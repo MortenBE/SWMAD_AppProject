@@ -1,25 +1,41 @@
 package dk.au.mad21spring.AppProject.model;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentId;
 
 public class Score {
-        public String name;
+        @DocumentId
+        private String documentId;
+        private String quizId;
+        public String quizzersName;
         private int score;
-        private int id;
 
         public Score() {
 
         }
-
-        public Score(String name, int score) {
-            this.name = name;
+        public Score(String quizzersName, int score, String quizId) {
+            this.quizzersName = quizzersName;
             this.score = score;
+            this.quizId = quizId;
         }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public int getScore() { return score; }
-        public void setScore(int score) { this.score = score; }
-
+        public String getDocumentId() {
+                return documentId;
+        }
+        public String getQuizId() {
+                return quizId;
+        }
+        public void setQuizId(String quizId) {
+                this.quizId = quizId;
+        }
+        public String getQuizzersName() {
+                return quizzersName;
+        }
+        public void setQuizzersName(String quizzersName) {
+                this.quizzersName = quizzersName;
+        }
+        public int getScore() {
+                return score;
+        }
+        public void setScore(int score) {
+                this.score = score;
+        }
 }
 

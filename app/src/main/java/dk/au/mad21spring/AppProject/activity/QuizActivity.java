@@ -134,7 +134,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void postScore() {
         Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
-        Score newScore = new Score(nameInput.getText().toString(), score);
+        Score newScore = new Score(nameInput.getText().toString(), score, "sdjasl");
         quizViewModel.addNewScore(newScore);
     }
 

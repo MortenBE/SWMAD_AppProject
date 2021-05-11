@@ -1,8 +1,7 @@
 package dk.au.mad21spring.AppProject.database;
 
 import android.util.Log;
-import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.OnFailureListener;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,7 +48,7 @@ public class Firestore {
                 for (DocumentSnapshot d : list) {
                     Score newScore = d.toObject(Score.class);
                     arrayList.add(newScore);
-                    Log.d(TAG, "" + newScore.getName());
+                    Log.d(TAG, "" + newScore.getQuizzersName());
                 }
                 Log.d(TAG, "1: " + arrayList.size());
             } else {

@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
-        GetQuizzes();
+        //GetQuizzes();
 
         mapViewModel.getQuizes().observe(this, q -> {
             quizzes = q;
@@ -97,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Only first time this should be called.
         //addQuizes();
 
-        GetQuizzes();
-
+        //GetQuizzes();
 
         initWigdets();
         initLocationTracking();
@@ -134,9 +133,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AddMapMarkers();
 
         mMap.setOnMarkerClickListener(marker -> {
-            Toast.makeText(MainActivity.this, "HEY" + marker.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+            intent.putExtra("QuizId", marker.getSnippet());
 
             try {
                 MainActivity.this.startActivity(intent);
@@ -151,8 +151,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void AddMapMarkers() {
         for (int i = 0; i< quizzes.size(); i ++)
         {
+            Log.d(TAG, quizzes.get(i).getDocumentId());
             mMap.addMarker(new MarkerOptions()
-                    .title(quizzes.get(i).getMockString())
+                    .snippet(quizzes.get(i).getDocumentId()) //TODO: check if there are better ways to store quizId in marker
                     .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
                     .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
         }
@@ -180,14 +181,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Quiz q1 = new Quiz();
         q1.setLatitude(56.1692);
         q1.setLongitude(10.1998);
-        q1.setMockString("q1 in Aarhus");
         q1.setCategory("24");
         q1.setDifficulity("medium");
 
         Quiz q2 = new Quiz();
         q2.setLatitude(56.1700);
         q2.setLongitude(10.1992);
-        q2.setMockString("q2 in Aarhus");
         q2.setCategory("26");
         q2.setDifficulity("medium");
 
@@ -223,7 +222,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-
     ////Location tracking
     private void initLocationTracking() {
         //Make a location request
@@ -255,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     currentLocation = location;
                 }
             }
-
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());

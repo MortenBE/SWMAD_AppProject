@@ -2,6 +2,7 @@ package dk.au.mad21spring.AppProject.viewmodel;
 
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -42,6 +43,7 @@ public class ScoreViewModel extends AndroidViewModel {
                 List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
                 for (DocumentSnapshot d : list) {
                     Score newScore = d.toObject(Score.class);
+                    Log.d(TAG, "ID: " + newScore.getDocumentId());
                     arrayList.add(newScore);
                 }
                 scores.setValue(arrayList);
