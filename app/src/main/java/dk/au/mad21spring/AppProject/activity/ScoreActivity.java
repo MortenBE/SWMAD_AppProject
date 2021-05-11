@@ -36,12 +36,9 @@ public class ScoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_score);
 
         scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
-        scoreViewModel.getAllScores().observe(this, new Observer<List<Score>>(){
-            @Override
-            public void onChanged(List<Score> scores) {
-                highscores = scores;
-                updateUI();
-            }
+        scoreViewModel.getAllScores().observe(this, scores -> {
+            highscores = scores;
+            updateUI();
         });
     }
     private void updateUI() {
