@@ -8,6 +8,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +31,8 @@ import dk.au.mad21spring.AppProject.API.QuizAPI;
 import dk.au.mad21spring.AppProject.API.QuizModel;
 import dk.au.mad21spring.AppProject.R;
 import org.apache.commons.text.StringEscapeUtils;
+
+import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.model.Score;
 import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
@@ -59,11 +62,14 @@ public class QuizActivity extends AppCompatActivity {
 
         quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
         getQuizSettings();
+        /*
         quizAPI = new QuizAPI(getApplication());
         setupWidgets();
         setupListener();
         hideUI();
         getQuiz();
+
+         */
     }
 
     private void getQuizSettings() {
@@ -71,9 +77,23 @@ public class QuizActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(getIntent().hasExtra("quizId"))
         {
+            quizViewModel.GetQuiz(getIntent().getStringExtra("quizId")).observe(this, myQuiz -> {
+                quizId = myQuiz.getDocumentId();//getIntent().getStringExtra("quizId");
+                difficultly = myQuiz.getDifficulity();
+                category = myQuiz .getCategory();
+                //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
+                quizAPI = new QuizAPI(getApplication());
+                setupWidgets();
+                setupListener();
+                hideUI();
+                getQuiz();
+        });
+            /*
             quizId = getIntent().getStringExtra("quizId");
             difficultly = intent.getStringExtra("difficultly");
             category = intent.getStringExtra("category");
+
+             */
 
             Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
         }
@@ -143,6 +163,8 @@ public class QuizActivity extends AppCompatActivity {
         Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
         Score newScore = new Score(nameInput.getText().toString(), score, quizId);
         quizViewModel.addNewScore(newScore);
+
+
     }
 
 
