@@ -306,7 +306,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             //Take relevant information from quiz object
             //Move to quiz activity
-            GoToQuizActivity();
+
+            // Hardcoded quiz info
+
+            Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+            intent.putExtra("difficultly", "medium");
+            intent.putExtra("category", "23");
+
+            GoToQuizActivity(intent);
         }
     }
 
@@ -342,9 +349,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return (dist);
     }
 
-    private void GoToQuizActivity() {
-        Intent intent = new Intent(MainActivity.this, QuizActivity.class);
-
+    private void GoToQuizActivity(Intent intent) {
         try {
             MainActivity.this.startActivity(intent);
         } catch (ActivityNotFoundException e) {

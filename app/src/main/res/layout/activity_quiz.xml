@@ -11,50 +11,47 @@
         android:id="@+id/RadioGroupQuiz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="125dp"
-        android:layout_marginLeft="125dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginLeft="55dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/questionText">
 
         <RadioButton
             android:id="@+id/quizButtonAns01"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RadioButton" />
+            android:layout_height="wrap_content" />
 
         <RadioButton
             android:id="@+id/quizButtonAns02"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RadioButton" />
+            android:layout_height="wrap_content" />
 
         <RadioButton
             android:id="@+id/quizButtonAns03"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RadioButton" />
+            android:layout_height="wrap_content" />
 
         <RadioButton
             android:id="@+id/quizButtonAns04"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RadioButton" />
+            android:layout_height="wrap_content" />
     </RadioGroup>
 
     <TextView
         android:id="@+id/questionText"
-        android:layout_width="276dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginTop="164dp"
-        android:hint="Quiz question"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="120dp"
+        android:hint="@string/quiz_question"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/NameScoreQuiz"
+        android:hint="@string/insert_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
@@ -62,19 +59,33 @@
         android:layout_marginTop="50dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Submit score"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/RadioGroupQuiz" />
+        app:layout_constraintTop_toBottomOf="@+id/scoreText" />
 
     <Button
         android:id="@+id/submitScoreBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="60dp"
         android:layout_marginStart="25dp"
         android:layout_marginLeft="25dp"
         android:layout_marginTop="25dp"
-        android:text="Submit score"
+        android:text="@string/submit_score"
         app:layout_constraintStart_toStartOf="@+id/NameScoreQuiz"
         app:layout_constraintTop_toBottomOf="@+id/NameScoreQuiz" />
+
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="301dp"
+        android:layout_height="77dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginLeft="55dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginEnd="55dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginRight="55dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

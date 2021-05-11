@@ -3,6 +3,7 @@ package dk.au.mad21spring.AppProject.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,7 +29,7 @@ import java.util.List;
 import dk.au.mad21spring.AppProject.API.QuizAPI;
 import dk.au.mad21spring.AppProject.API.QuizModel;
 import dk.au.mad21spring.AppProject.R;
-import dk.au.mad21spring.AppProject.database.Repository;
+import org.apache.commons.text.StringEscapeUtils;
 import dk.au.mad21spring.AppProject.model.Score;
 import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
@@ -38,7 +39,7 @@ public class QuizActivity extends AppCompatActivity {
 
     RadioButton quiz01, quiz02, quiz03, quiz04;
     RadioGroup radioGroup;
-    TextView Question;
+    TextView Question, scoreText;
     QuizAPI quizAPI;
     Button submitBtn;
     EditText nameInput;
@@ -57,19 +58,25 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz);
 
         quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
-
+        getQuizSettings();
         quizAPI = new QuizAPI(getApplication());
         setupWidgets();
         setupListener();
         hideUI();
-        difficultly = "medium";
-        category = "25";
         getQuiz();
     }
 
+    private void getQuizSettings() {
+
+        Intent intent = getIntent();
+        difficultly = intent.getStringExtra("difficultly");
+        category = intent.getStringExtra("category");
+    }
+
+
     private void hideUI() {
 
-
+        scoreText.setVisibility(View.GONE);
         submitBtn.setVisibility(View.GONE);
         nameInput.setVisibility(View.GONE);
         quiz01.setVisibility(View.GONE);
@@ -89,42 +96,47 @@ public class QuizActivity extends AppCompatActivity {
         quiz04.setTextColor(Color.BLACK);
 
 
-        questionsArr[0] = quiz.getResults().get(questionCounter).getCorrectAnswer();
-        questionsArr[1] = quiz.getResults().get(questionCounter).getIncorrectAnswers().get(0);
-        questionsArr[2] = quiz.getResults().get(questionCounter).getIncorrectAnswers().get(1);
-        questionsArr[3] = quiz.getResults().get(questionCounter).getIncorrectAnswers().get(2);
+        questionsArr[0] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getCorrectAnswer());
+        questionsArr[1] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(0));
+        questionsArr[2] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(1));
+        questionsArr[3] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(2));
+
+
 
         List<String> tempList = Arrays.asList(questionsArr);
         Collections.shuffle(tempList);
         tempList.toArray(questionsArr);
 
 
-        Question.setText(quiz.getResults().get(questionCounter).getQuestion().replace("&amp;", "&").replace("&quot;", "\""));
-        quiz01.setText(questionsArr[0].replace("&amp;", "&").replace("&quot;", "\""));
-        quiz02.setText(questionsArr[1].replace("&amp;", "&").replace("&quot;", "\""));
-        quiz03.setText(questionsArr[2].replace("&amp;", "&").replace("&quot;", "\""));
-        quiz04.setText(questionsArr[3].replace("&amp;", "&").replace("&quot;", "\""));
-    }
+        Question.setText(StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getQuestion()));
+        quiz01.setText(questionsArr[0]);
+        quiz02.setText(questionsArr[1]);
+        quiz03.setText(questionsArr[2]);
+        quiz04.setText(questionsArr[3]);
+    }//.replace("&amp;", "&").replace("&quot;", "\"").replace("&#039;","'").replace("&ldquo;","\"").replace("&rdquo;","\""));
 
     private void setupListener() {
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             checkResult(checkedId);
-            nextQuestion();
         });
         submitBtn.setOnClickListener(v -> {
-            name = nameInput.getText().toString();
+            if (!nameInput.getText().toString().isEmpty())
+            {
             postScore();
             goToMapActivity();
+            }
+            else
+            {
+
+                Toast.makeText(this, "Please write a name, and try agian", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void postScore() {
-
-        // IMPLEMENT PERSISTANCE OF SCORE & NAME TO DB
         Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
-        Score newScore = new Score(name, score);
+        Score newScore = new Score(nameInput.getText().toString(), score);
         quizViewModel.addNewScore(newScore);
-
     }
 
 
@@ -138,35 +150,43 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void nextQuestion() {
         if (questionCounter < questionCountTotal)
         {
-            setQuestion(questionCounter);
             questionCounter ++;
+            setQuestion(questionCounter);
         }
         else{
-            Toast.makeText(this, "Quiz done, you got: " + score + " out of 4 questions correct, input name and submit score below", Toast.LENGTH_LONG).show();
-
+            scoreText.setText("Quiz done, you got: " + score + " out of 4 questions correct, input name and submit score below");
+            scoreText.setVisibility(View.VISIBLE);
             submitBtn.setVisibility(View.VISIBLE);
             nameInput.setVisibility(View.VISIBLE);
+            quiz01.setVisibility(View.GONE);
+            quiz02.setVisibility(View.GONE);
+            quiz03.setVisibility(View.GONE);
+            quiz04.setVisibility(View.GONE);
+            Question.setVisibility(View.GONE);
         }
     }
 
     private void checkResult(int Id) {
         RadioButton checkedButton = findViewById(Id);
 
-        checkedButton.setChecked(false);
-        if ( checkedButton.getText() == quiz.getResults().get(questionCounter).getCorrectAnswer())
+        if (checkedButton.getText().equals(quiz.getResults().get(questionCounter).getCorrectAnswer()))
         {
             Toast.makeText(this, "Correct Answer", Toast.LENGTH_SHORT).show();
             score ++;
         }
         else {
-            Toast.makeText(this, "Wrong Answer, correct answer was: " + quiz.getResults().get(questionCounter).getCorrectAnswer(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Wrong Answer, correct answer was: " + quiz.getResults().get(questionCounter).getCorrectAnswer()+"a", Toast.LENGTH_LONG).show();
         }
+        checkedButton.setChecked(false);
+        nextQuestion();
     }
 
     private void setupWidgets() {
+        scoreText = findViewById(R.id.scoreText);
         quiz01 = findViewById(R.id.quizButtonAns01);
         quiz02 = findViewById(R.id.quizButtonAns02);
         quiz03 = findViewById(R.id.quizButtonAns03);

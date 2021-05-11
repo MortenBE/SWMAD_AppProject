@@ -9,7 +9,7 @@ import dk.au.mad21spring.AppProject.database.Repository;
 import dk.au.mad21spring.AppProject.model.Score;
 
 public class QuizViewModel extends AndroidViewModel {
-    private Repository instance;
+    private final Repository instance;
 
 
 

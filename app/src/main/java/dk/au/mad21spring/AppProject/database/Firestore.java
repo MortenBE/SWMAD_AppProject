@@ -13,12 +13,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
+
+import dk.au.mad21spring.AppProject.activity.MainActivity;
+import dk.au.mad21spring.AppProject.activity.QuizActivity;
 import dk.au.mad21spring.AppProject.model.Score;
 
 
 public class Firestore {
     private static final String TAG = "Firestore";
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
 
     public Firestore() {
         db = FirebaseFirestore.getInstance();
@@ -29,16 +32,10 @@ public class Firestore {
         //collection reference for database
         CollectionReference dbQuizResult = db.collection("Scores");
 
-        dbQuizResult.add(score).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                //Toast.makeText(QuizActivity.this, "Results has been added", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                //Toast.makeText(QuizActivity.this, "Failed to add Quiz Results", Toast.LENGTH_SHORT).show();
-            }
+        dbQuizResult.add(score).addOnSuccessListener(documentReference -> {
+            //Toast.makeText(GetContext, "Results has been added", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            //Toast.makeText(QuizActivity.this, "Failed to add Quiz Results", Toast.LENGTH_SHORT).show();
         });
     }
 
