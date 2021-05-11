@@ -92,16 +92,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mapViewModel.getQuizes().observe(this, q -> {
             quizzes = q;
-            AddMapMarkers();
+            initWigdets();
+            initLocationTracking();
+            initMap();
         });
         // Only first time this should be called.
         //addQuizes();
 
         //GetQuizzes();
 
+
+        /*
         initWigdets();
         initLocationTracking();
         initMap();
+        
+         */
     }
 
     private void initWigdets() {
