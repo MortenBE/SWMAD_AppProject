@@ -38,9 +38,9 @@ public class ScoreActivity extends AppCompatActivity {
     }
 
     private void getQuiz() {
-        if(getIntent().hasExtra("QuizId"))
+        if(getIntent().hasExtra("quizId"))
         {
-            String quizId = getIntent().getStringExtra("QuizId");
+            String quizId = getIntent().getStringExtra("quizId");
             Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
         }
     }

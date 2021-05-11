@@ -48,8 +48,8 @@ public class QuizActivity extends AppCompatActivity {
     private QuizModel quiz;
     private int score = 0;
     private String name;
-    private String difficultly;
-    private String category;
+    private String difficultly, category, quizId;
+
 
 
     @Override
@@ -69,8 +69,15 @@ public class QuizActivity extends AppCompatActivity {
     private void getQuizSettings() {
 
         Intent intent = getIntent();
-        difficultly = intent.getStringExtra("difficultly");
-        category = intent.getStringExtra("category");
+        if(getIntent().hasExtra("quizId"))
+        {
+            quizId = getIntent().getStringExtra("quizId");
+            difficultly = intent.getStringExtra("difficultly");
+            category = intent.getStringExtra("category");
+
+            Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
@@ -127,14 +134,14 @@ public class QuizActivity extends AppCompatActivity {
             }
             else
             {
-                Toast.makeText(this, "Please write a name, and try agian", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please write a name, and try again", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void postScore() {
         Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
-        Score newScore = new Score(nameInput.getText().toString(), score, "sdjasl");
+        Score newScore = new Score(nameInput.getText().toString(), score, quizId);
         quizViewModel.addNewScore(newScore);
     }
 

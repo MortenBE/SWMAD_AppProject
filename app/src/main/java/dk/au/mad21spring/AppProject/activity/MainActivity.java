@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(MainActivity.this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
-            intent.putExtra("QuizId", marker.getSnippet());
+            intent.putExtra("quizId", marker.getSnippet());
 
             try {
                 MainActivity.this.startActivity(intent);
@@ -340,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // Hardcoded quiz info
 
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+            intent.putExtra("quizId", quiz.getDocumentId());
             intent.putExtra("difficultly", "medium");
             intent.putExtra("category", "23");
 
