@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Circle myPositionCircle;
     Location currentLocation;
 
-
-
     public static final int PERMISSIONS_REQUEST_LOCATION = 101;
     public static final int REQUEST_CHECK_SETTINGS = 201;
     private static final String TAG = "MapsActivity";
@@ -98,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         // Only first time this should be called.
         //addQuizes();
-
         //GetQuizzes();
 
 
@@ -106,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initWigdets();
         initLocationTracking();
         initMap();
-        
+
          */
     }
 

@@ -26,8 +26,11 @@ public class ScoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score);
 
-        /*
+
         scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
+
+
+        /*
         scoreViewModel.getAllScores().observe(this, scores -> {
             highscores = scores;
             updateUI();
@@ -40,7 +43,9 @@ public class ScoreActivity extends AppCompatActivity {
     private void getQuiz() {
         if(getIntent().hasExtra("quizId"))
         {
+
             String quizId = getIntent().getStringExtra("quizId");
+            scoreViewModel.ObserveScores(quizId);
             Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
         }
     }

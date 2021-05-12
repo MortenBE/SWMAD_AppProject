@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -36,26 +37,34 @@ public class ScoreViewModel extends AndroidViewModel {
         db = FirebaseFirestore.getInstance();
     }
 
-    private void ObserveScores(){
+    public void ObserveScores(String id){
         ArrayList<Score> arrayList = new ArrayList<>();
-        db.collection("Scores").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if(!queryDocumentSnapshots.isEmpty()) {
-                List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
-                for (DocumentSnapshot d : list) {
-                    Score newScore = d.toObject(Score.class);
-                    Log.d(TAG, "ID: " + newScore.getDocumentId());
-                    arrayList.add(newScore);
-                }
-                scores.setValue(arrayList);
+        CollectionReference colRef;
+        db.collection("Scores")
+                .whereEqualTo("quizId",id)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(!queryDocumentSnapshots.isEmpty()) {
+                        List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+                        for (DocumentSnapshot d : list) {
+                            Score newScore = d.toObject(Score.class);
+                            Log.d(TAG, "quizID: " + newScore.getQuizId());
+                            Log.d(TAG, "scoreID: " + newScore.getDocumentId());
+                            arrayList.add(newScore);
+                        }
+                        scores.setValue(arrayList);
             } else {
                 Log.d(TAG, "No data found in database");
             }
         }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
     }
 
+    /*
     public LiveData<List<Score>> getAllScores(){
         ObserveScores();
         return scores;
     }
+
+     */
 
 }
