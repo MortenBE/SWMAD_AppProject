@@ -1,6 +1,5 @@
 package dk.au.mad21spring.AppProject.activity;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -92,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             initLocationTracking();
             initMap();
         });
+
+
         // Only first time this should be called.
         //addQuizes();
     }
@@ -150,23 +151,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
         }
     }
-
-    //TODO:Replace with a method for getting persisted quiz/location data
-    /*private void mockGetQuizzes()
-    {
-        Quiz q1 = new Quiz();
-        q1.setLatitude(56.1692);
-        q1.setLongitude(10.1998);
-        q1.setMockString("q1 in Aarhus");
-
-        Quiz q2 = new Quiz();
-        q2.setLatitude(56.1700);
-        q2.setLongitude(10.1992);
-        q2.setMockString("q2 in Aarhus");
-
-        quizzes.add(q1);
-        quizzes.add(q2);
-    }*/
 
     private void addQuizes()
     {
@@ -324,18 +308,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (quiz == null) {
             Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
         } else {
-            //Take relevant information from quiz object
-            //Move to quiz activity
-
-            // Hardcoded quiz info
-
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
             intent.putExtra("quizId", quiz.getDocumentId());
-
-            /*
-            intent.putExtra("difficultly", "medium");
-            intent.putExtra("category", "23");
-             */
 
             GoToQuizActivity(intent);
         }

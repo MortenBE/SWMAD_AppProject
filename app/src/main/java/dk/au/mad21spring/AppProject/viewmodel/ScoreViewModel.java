@@ -30,47 +30,14 @@ import dk.au.mad21spring.AppProject.model.Score;
 public class ScoreViewModel extends AndroidViewModel {
 
     private static final String TAG = "ScoreViewModel";
-    private FirebaseFirestore db;
-    private MutableLiveData<List<Score>> scores = new MutableLiveData<>();
-
-    /*
-    public MutableLiveData<List<Score>> getScores() {
-        return scores;
-    }
-
-    public void setScores(MutableLiveData<List<Score>> scores) {
-        this.scores = scores;
-    }
-
-     */
+    private Repository repository;
 
     public ScoreViewModel(@NonNull Application application) {
         super(application);
-        db = FirebaseFirestore.getInstance();
+        repository = new Repository();
     }
 
-    //.whereEqualTo("quizId",id)
-    //Gets highscores in descending order
-    public MutableLiveData<List<Score>> getScores(String id){
-        ArrayList<Score> arrayList = new ArrayList<>();
-        db.collection("Scores")
-                .whereEqualTo("quizId",id).orderBy("score", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if(!queryDocumentSnapshots.isEmpty()) {
-                        List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
-                        for (DocumentSnapshot d : list) {
-                            Score newScore = d.toObject(Score.class);
-                            Log.d(TAG, "quizID: " + newScore.getQuizId());
-                            Log.d(TAG, "scoreID: " + newScore.getDocumentId());
-                            arrayList.add(newScore);
-                        }
-                        scores.setValue(arrayList);
-            } else {
-                Log.d(TAG, "No data found in database");
-            }
-        }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
-
-        return scores;
+    public MutableLiveData<List<Score>> getScores(String quizId){
+        return repository.getScoresByQuizId(quizId);
     }
 }

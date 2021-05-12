@@ -2,9 +2,13 @@ package dk.au.mad21spring.AppProject.database;
 
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+
 import java.util.ArrayList;
 import java.util.List;
 import dk.au.mad21spring.AppProject.model.Quiz;
@@ -83,8 +87,31 @@ public class Firestore {
 
     CollectionReference getScoresCollectionReference() {
         return db.collection("Scores");
+    }
 
+    //https://firebase.google.com/docs/firestore/query-data/order-limit-data
+    //Gets highscores in descending order
+    public MutableLiveData<List<Score>> getScoresByQuizId(String quizId){
+        MutableLiveData<List<Score>> scores = new MutableLiveData<>();
 
+        db.collection("Scores")
+                .whereEqualTo("quizId",quizId).orderBy("score", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(!queryDocumentSnapshots.isEmpty()) {
+                        List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+                        ArrayList<Score> arrayList = new ArrayList<>();
+                        for (DocumentSnapshot d : list) {
+                            Score newScore = d.toObject(Score.class);
+                            arrayList.add(newScore);
+                        }
+                        scores.setValue(arrayList);
+                    } else {
+                        Log.d(TAG, "No data found in database");
+                    }
+                }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
+
+        return scores;
     }
 
 

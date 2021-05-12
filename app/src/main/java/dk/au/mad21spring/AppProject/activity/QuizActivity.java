@@ -68,7 +68,6 @@ public class QuizActivity extends AppCompatActivity {
         setupListener();
         hideUI();
         getQuiz();
-
          */
     }
 
