@@ -21,42 +21,20 @@ import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.model.Score;
 
 public class QuizViewModel extends AndroidViewModel {
-    private final Repository instance;
-    private final FirebaseFirestore db; //TODO:Remove
 
+    private Repository repository;
     private static final String TAG = "QuizViewModel";
 
     public QuizViewModel(@NonNull Application application) {
         super(application);
-        instance = new Repository();
-        db = FirebaseFirestore.getInstance();
+        repository = Repository.getInstance();
     }
 
     public void addNewScore(Score score) {
-        instance.addNewScore(score);
+        repository.addNewScore(score);
     }
 
-
-    //https://firebase.google.com/docs/firestore/query-data/get-data
     public MutableLiveData<Quiz> GetQuiz(String quizId){
-        MutableLiveData<Quiz> quiz = new MutableLiveData<>();
-        db.collection("Quizes").document(quizId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                quiz.setValue(document.toObject(Quiz.class));
-                            } else {
-                                Log.d(TAG, "No such document");
-                            }
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                });
-        return quiz;
+        return repository.GetQuizById(quizId);
     }
 }

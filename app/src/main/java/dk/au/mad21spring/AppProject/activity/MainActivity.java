@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
-        mapViewModel.getQuizes().observe(this, q -> {
+        mapViewModel.getQuizzes().observe(this, q -> {
             quizzes = q;
             initWigdets();
             initLocationTracking();
@@ -170,10 +170,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapViewModel.addQuiz(q2);
     }
 
-    private void GetQuizzes()
-    {
-        mapViewModel.getQuizes();
-    }
 
     //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {

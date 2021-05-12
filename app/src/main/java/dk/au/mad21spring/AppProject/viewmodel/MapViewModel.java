@@ -21,40 +21,21 @@ import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.model.Score;
 
 public class MapViewModel extends AndroidViewModel {
-    private final Repository instance;
-    private final FirebaseFirestore db;
-    private final MutableLiveData<List<Quiz>> quizzes = new MutableLiveData<>();
+
+    private Repository repository;
     private static final String TAG = "MapViewModel";
 
     public MapViewModel(@NonNull Application application) {
         super(application);
-        instance = new Repository();
-        db = FirebaseFirestore.getInstance();
+        repository = Repository.getInstance();
     }
 
     public void addQuiz(Quiz quiz) {
-        instance.addNewQuiz(quiz);
+        repository.addNewQuiz(quiz);
     }
 
-    private void ObserveQuizzes(){
-        ArrayList<Quiz> arrayList = new ArrayList<>();
-        db.collection("Quizes").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if(!queryDocumentSnapshots.isEmpty()) {
-                List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
-                for (DocumentSnapshot d : list) {
-                    Quiz newQuiz = d.toObject(Quiz.class);
-                    arrayList.add(newQuiz);
-                }
-                quizzes.setValue(arrayList);
-            } else {
-                Log.d(TAG, "No data found in database");
-            }
-        }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
-    }
-
-    public MutableLiveData<List<Quiz>> getQuizes(){
-        ObserveQuizzes();
-        return quizzes;
+    public MutableLiveData<List<Quiz>> getQuizzes(){
+        return repository.getQuizzes();
     }
 }
 

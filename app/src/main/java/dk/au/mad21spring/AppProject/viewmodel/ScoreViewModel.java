@@ -29,12 +29,12 @@ import dk.au.mad21spring.AppProject.model.Score;
 
 public class ScoreViewModel extends AndroidViewModel {
 
-    private static final String TAG = "ScoreViewModel";
     private Repository repository;
+    private static final String TAG = "ScoreViewModel";
 
     public ScoreViewModel(@NonNull Application application) {
         super(application);
-        repository = new Repository();
+        repository = Repository.getInstance();
     }
 
     public MutableLiveData<List<Score>> getScores(String quizId){

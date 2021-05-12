@@ -2,8 +2,11 @@ package dk.au.mad21spring.AppProject.database;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -114,8 +117,46 @@ public class Firestore {
         return scores;
     }
 
+    //https://firebase.google.com/docs/firestore/query-data/get-data
+    //Gets quiz be quizId
+    public MutableLiveData<Quiz> GetQuizbyId(String quizId){
+        MutableLiveData<Quiz> quiz = new MutableLiveData<>();
+        db.collection("Quizes").document(quizId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                quiz.setValue(document.toObject(Quiz.class));
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
+        return quiz;
+    }
 
+    public MutableLiveData<List<Quiz>> getQuizzes(){
+        MutableLiveData<List<Quiz>> quizzes = new MutableLiveData<>();
+        db.collection("Quizes").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if(!queryDocumentSnapshots.isEmpty()) {
+                List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+                ArrayList<Quiz> arrayList = new ArrayList<>();
+                for (DocumentSnapshot d : list) {
+                    Quiz newQuiz = d.toObject(Quiz.class);
+                    arrayList.add(newQuiz);
+                }
+                quizzes.setValue(arrayList);
+            } else {
+                Log.d(TAG, "No data found in database");
+            }
+        }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
 
-
-
+        return quizzes;
+    }
 }
