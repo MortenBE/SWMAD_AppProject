@@ -78,9 +78,10 @@ public class QuizActivity extends AppCompatActivity {
         if(getIntent().hasExtra("quizId"))
         {
             quizViewModel.GetQuiz(getIntent().getStringExtra("quizId")).observe(this, myQuiz -> {
-                quizId = myQuiz.getDocumentId();//getIntent().getStringExtra("quizId");
+                quizId = myQuiz.getDocumentId();
                 difficultly = myQuiz.getDifficulity();
                 category = myQuiz .getCategory();
+
                 //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
                 quizAPI = new QuizAPI(getApplication());
                 setupWidgets();
@@ -88,12 +89,6 @@ public class QuizActivity extends AppCompatActivity {
                 hideUI();
                 getQuiz();
         });
-            /*
-            quizId = getIntent().getStringExtra("quizId");
-            difficultly = intent.getStringExtra("difficultly");
-            category = intent.getStringExtra("category");
-
-             */
 
             Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
         }

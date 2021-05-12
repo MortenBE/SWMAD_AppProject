@@ -86,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
-        //GetQuizzes();
-
         mapViewModel.getQuizes().observe(this, q -> {
             quizzes = q;
             initWigdets();
@@ -96,15 +94,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         // Only first time this should be called.
         //addQuizes();
-        //GetQuizzes();
-
-
-        /*
-        initWigdets();
-        initLocationTracking();
-        initMap();
-
-         */
     }
 
     private void initWigdets() {
@@ -306,8 +295,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());
-
-
     }
 
     //Finds current locations once
@@ -344,8 +331,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
             intent.putExtra("quizId", quiz.getDocumentId());
+
+            /*
             intent.putExtra("difficultly", "medium");
             intent.putExtra("category", "23");
+             */
 
             GoToQuizActivity(intent);
         }

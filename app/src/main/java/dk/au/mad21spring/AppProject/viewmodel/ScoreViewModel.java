@@ -15,6 +15,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -32,16 +33,28 @@ public class ScoreViewModel extends AndroidViewModel {
     private FirebaseFirestore db;
     private MutableLiveData<List<Score>> scores = new MutableLiveData<>();
 
+    /*
+    public MutableLiveData<List<Score>> getScores() {
+        return scores;
+    }
+
+    public void setScores(MutableLiveData<List<Score>> scores) {
+        this.scores = scores;
+    }
+
+     */
+
     public ScoreViewModel(@NonNull Application application) {
         super(application);
         db = FirebaseFirestore.getInstance();
     }
 
-    public void ObserveScores(String id){
+    //.whereEqualTo("quizId",id)
+    //Gets highscores in descending order
+    public MutableLiveData<List<Score>> getScores(String id){
         ArrayList<Score> arrayList = new ArrayList<>();
-        CollectionReference colRef;
         db.collection("Scores")
-                .whereEqualTo("quizId",id)
+                .whereEqualTo("quizId",id).orderBy("score", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if(!queryDocumentSnapshots.isEmpty()) {
@@ -57,14 +70,7 @@ public class ScoreViewModel extends AndroidViewModel {
                 Log.d(TAG, "No data found in database");
             }
         }).addOnFailureListener(e -> Log.d(TAG, "A Failure has occurred with Firestore"));
-    }
 
-    /*
-    public LiveData<List<Score>> getAllScores(){
-        ObserveScores();
         return scores;
     }
-
-     */
-
 }

@@ -19,41 +19,39 @@ public class ScoreActivity extends AppCompatActivity {
 
     ScoreViewModel scoreViewModel;
 
-    private List<Score> highscores = new ArrayList();
+    private List<Score> highscores;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score);
 
-
+        //Init ViewModel
         scoreViewModel = new ViewModelProvider(this).get(ScoreViewModel.class);
 
-
-        /*
-        scoreViewModel.getAllScores().observe(this, scores -> {
-            highscores = scores;
-            updateUI();
-        });
-         */
-
-        getQuiz();
-    }
-
-    private void getQuiz() {
         if(getIntent().hasExtra("quizId"))
         {
-
+            //Get quizId
             String quizId = getIntent().getStringExtra("quizId");
-            scoreViewModel.ObserveScores(quizId);
-            Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
+
+            //Setup observer for quiz highscores
+            scoreViewModel.getScores(quizId).observe(this, scores -> {
+                highscores = scores;
+
+                //Do something with the scores
+                updateUI();
+            });
         }
     }
 
+    private void initWidgets(){
+
+    }
+
     private void updateUI() {
-        for(int i = 0; i < highscores.size(); i++)
+        for (int j = 0; j < highscores.size(); j ++)
         {
-            Toast.makeText(this, "" + highscores.get(i).quizzersName, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, (j + 1) + ": Player: " + highscores.get(j).quizzersName + ", Score: " + highscores.get(j).getScore(), Toast.LENGTH_SHORT).show();
         }
     }
 }
