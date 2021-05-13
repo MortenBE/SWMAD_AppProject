@@ -84,10 +84,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initWigdets();
+
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         mapViewModel.getQuizzes().observe(this, q -> {
             quizzes = q;
-            initWigdets();
             initLocationTracking();
             initMap();
         });
@@ -105,9 +106,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(currentLocation != null)
             {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 18));
+                ConquerQuiz();
             }
-            ConquerQuiz();
+
+
         });
+
     }
 
     ////Map
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkLocationPermission();
 
         AddMapMarkers();
-
+        QuizButton.setEnabled(true);
         mMap.setOnMarkerClickListener(marker -> {
             Toast.makeText(MainActivity.this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
