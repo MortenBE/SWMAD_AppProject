@@ -15,21 +15,25 @@
         app:layout_constraintTop_toBottomOf="@+id/questionText">
 
         <RadioButton
+            android:textSize="20sp"
             android:id="@+id/quizButtonAns01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <RadioButton
+            android:textSize="20sp"
             android:id="@+id/quizButtonAns02"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <RadioButton
+            android:textSize="20sp"
             android:id="@+id/quizButtonAns03"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <RadioButton
+            android:textSize="20sp"
             android:id="@+id/quizButtonAns04"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -43,7 +47,7 @@
         android:layout_marginLeft="25dp"
         android:layout_marginTop="40dp"
         android:hint="@string/quiz_question"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -82,7 +86,7 @@
         android:layout_marginTop="75dp"
         android:layout_marginEnd="55dp"
         android:layout_marginRight="55dp"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
