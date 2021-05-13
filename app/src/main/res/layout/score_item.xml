@@ -44,6 +44,8 @@
                 android:id="@+id/rowPlacement"
                 android:layout_width="59dp"
                 android:layout_height="38dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"

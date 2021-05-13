@@ -96,13 +96,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mapViewModel.getCurrentLocation().observe(this, location -> {
             if (mapReady){
-                Log.d(TAG, "Location update");
                 showPlacementOnMap(location);
             }
             currentLocation = location;
         });
-
-
 
         //addQuizes();
     }
