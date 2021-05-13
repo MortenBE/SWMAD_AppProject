@@ -196,7 +196,7 @@ public class QuizActivity extends AppCompatActivity {
             setQuestion(questionCounter);
         }
         else{
-            scoreText.setText(getResources().getString(R.string.quiz_score1) + score + getResources().getString(R.string.quiz_score2));
+            scoreText.setText(getResources().getString(R.string.quiz_score1) + " " + score + " " + getResources().getString(R.string.quiz_score2));
             scoreText.setVisibility(View.VISIBLE);
             submitBtn.setVisibility(View.VISIBLE);
             nameInput.setVisibility(View.VISIBLE);
