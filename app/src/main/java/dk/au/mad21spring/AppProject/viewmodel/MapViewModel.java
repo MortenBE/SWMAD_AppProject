@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+import android.location.Location;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,6 +29,11 @@ public class MapViewModel extends AndroidViewModel {
     public MapViewModel(@NonNull Application application) {
         super(application);
         repository = Repository.getInstance();
+    }
+
+    public MutableLiveData<Location> getCurrentLocation()
+    {
+        return repository.getCurrentLocation();
     }
 
     public void addQuiz(Quiz quiz) {

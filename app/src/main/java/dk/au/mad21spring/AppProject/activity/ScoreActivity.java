@@ -19,7 +19,7 @@ public class ScoreActivity extends AppCompatActivity {
     private static final String TAG = "ScoreActivity";
 
     ScoreViewModel scoreViewModel;
-    String quizId;
+    private String quizId;
 
     private List<Score> highscores;
 
@@ -32,7 +32,7 @@ public class ScoreActivity extends AppCompatActivity {
         if(getIntent().hasExtra("quizId")) {
             quizId = getIntent().getStringExtra("quizId");
         } else if(savedInstanceState != null) {
-            savedInstanceState.getString("quizId");
+            quizId = savedInstanceState.getString("quizId");
         }
 
         //Init ViewModel
@@ -67,4 +67,6 @@ public class ScoreActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
     }
+
+
 }
