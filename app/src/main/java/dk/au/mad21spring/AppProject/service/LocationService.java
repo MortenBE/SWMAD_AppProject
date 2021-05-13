@@ -40,15 +40,6 @@ import dk.au.mad21spring.AppProject.database.Repository;
 
 public class LocationService extends Service {
 
-    /*
-    ExecutorService executorService;
-
-    public static final String SERVICE_CHANEL = "serviceChanel";
-    private int sleepTime = 5000;
-    private boolean started = false;
-
-     */
-
     private static final String TAG = "LocationService";
     public static final int REQUEST_CHECK_SETTINGS = 201;
 
@@ -70,7 +61,6 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "On start");
-        //updateData();
         initLocationTracking();
         startLocationTracking();
 
@@ -94,9 +84,6 @@ public class LocationService extends Service {
                     {
                         repository.setCurrentLocation(location);
                     }
-
-
-
                 }
             }
             @Override
@@ -128,52 +115,9 @@ public class LocationService extends Service {
                 Looper.getMainLooper());
     }
 
-
-    /*
-    private void updateData(){
-        Log.d(TAG, "Updata data");
-        if(!started){
-            started = true;
-            recursiveUpdate();
-        }
-    }
-
-    //Handles work every 60 seconds recursively
-    private void recursiveUpdate(){
-        Log.d(TAG, "recursiveUpdate");
-        if(executorService == null) {
-            executorService = Executors.newSingleThreadExecutor();
-        }
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                //Wait 1 minute
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    Log.e(TAG, "run: ERROR", e);
-                }
-                if(started) {
-                    //Do the work
-                    Toast.makeText(LocationService.this, "Hej fra service", Toast.LENGTH_SHORT).show();
-
-                    Log.d(TAG, "Hej fra service");
-                    //Repeat
-                    recursiveUpdate();
-                }
-            }
-        });
-    }
-
-     */
-
-
-
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-
     }
 
 
