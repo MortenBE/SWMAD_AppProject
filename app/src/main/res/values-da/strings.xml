@@ -20,5 +20,6 @@
     <string name="request_name_and_try_again">Venlig skriv dit navn og prøv igen</string>
     <string name="submittet_score">"Indsendt score: "</string>
     <string name="with_name">" Med navn: "</string>
+    <string name="quiz">Quiz</string>
 
 </resources>
