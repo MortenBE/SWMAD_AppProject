@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         mapViewModel.getQuizzes().observe(this, q -> {
             quizzes = q;
-            initLocationTracking();
             initMap();
         });
         mapViewModel.getCurrentLocation().observe(this, location -> {
@@ -217,20 +216,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Move circle to match current position
             myPositionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
         }
-    }
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    // Got last known location. In some rare situations this can be null.
-                    if (location != null) {
-                        // Logic to handle location object
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.location_latitude) + location.getLatitude() + getResources().getString(R.string.location_longitude) + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     ////Quiz
