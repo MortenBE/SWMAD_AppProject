@@ -17,6 +17,10 @@ import dk.au.mad21spring.AppProject.viewmodel.ScoreViewModel;
 
 public class ScoreActivity extends AppCompatActivity {
     private static final String TAG = "ScoreActivity";
+    private final String COLLECTION_KEY = "Scores";
+
+    //Views
+    private
 
     ScoreViewModel scoreViewModel;
     String quizId;
