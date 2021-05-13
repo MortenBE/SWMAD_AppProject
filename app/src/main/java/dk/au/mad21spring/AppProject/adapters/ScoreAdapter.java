@@ -43,9 +43,9 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.itemView.setTag(scoreArrayList.get(position));
-        //holder.name.setText(scoreArrayList.get(position).getQuizzersName());
-        //holder.score.setText(scoreArrayList.get(position).getScore());
-        holder.name.setText(scoreArrayList.get(position).getQuizzersName());
+        holder.rowPlacement.setText(String.format("%d.", position + 1));
+        holder.rowScore.setText(String.format("Score: %d", scoreArrayList.get(position).getScore()));
+        holder.rowName.setText(scoreArrayList.get(position).getQuizzersName());
     }
 
     @Override
@@ -54,13 +54,16 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ViewHolder> 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name, score;
+        TextView rowPlacement, rowScore, rowName;
+
         ConstraintLayout constraintLayoutlayout;
         public ViewHolder(View itemView) {
             super(itemView);
 
-            name = itemView.findViewById(R.id.itemNameTextView);
-            constraintLayoutlayout = itemView.findViewById(R.id.constraintLayout);
+            rowName = itemView.findViewById(R.id.rowName);
+            rowPlacement = itemView.findViewById(R.id.rowPlacement);
+            rowScore = itemView.findViewById(R.id.rowScore);
+            constraintLayoutlayout = itemView.findViewById(R.id.ConstraintLayout);
             //score = itemView.findViewById(R.id.scoreTextView);
         }
     }
