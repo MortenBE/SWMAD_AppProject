@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button QuizButton;
     private GoogleMap mMap;
     private List<Quiz> quizzes = new ArrayList();
+    private Boolean mapReady = false;
 
     MapViewModel mapViewModel;
 
@@ -91,10 +92,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             quizzes = q;
             initMap();
         });
+
         mapViewModel.getCurrentLocation().observe(this, location -> {
-            showPlacementOnMap(location);
+            if (mapReady){
+                showPlacementOnMap(location);
+            }
             currentLocation = location;
         });
+
+
 
         //addQuizes();
     }
@@ -129,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mapReady = true;
 
         checkLocationPermission();
 
@@ -145,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(MainActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
             }
+
+
 
             return false;
         });
