@@ -84,10 +84,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initWigdets();
+
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         mapViewModel.getQuizzes().observe(this, q -> {
             quizzes = q;
-            initWigdets();
+            initLocationTracking();
             initMap();
         });
         mapViewModel.getCurrentLocation().observe(this, location -> {
@@ -110,9 +112,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         QuizButton.setOnClickListener(v -> {
             if (currentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 18));
+                ConquerQuiz();
             }
-            ConquerQuiz();
+
+
         });
+
     }
 
     ////Map
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkLocationPermission();
 
         AddMapMarkers();
-
+        QuizButton.setEnabled(true);
         mMap.setOnMarkerClickListener(marker -> {
             Toast.makeText(MainActivity.this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 MainActivity.this.startActivity(intent);
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
             }
 
             return false;
@@ -215,6 +220,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        // Logic to handle location object
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.location_latitude) + location.getLatitude() + getResources().getString(R.string.location_longitude) + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
     ////Quiz
     private void ConquerQuiz() {
@@ -222,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Quiz quiz = FindNearbyQuiz();
 
         if (quiz == null) {
-            Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.no_quizzes_near), Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
             intent.putExtra("quizId", quiz.getDocumentId());
@@ -238,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Distance from current location
             distance = calculateDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude());
 
-            Toast.makeText(this, "Distance: " + distance + "m", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.distance_m) + distance + "m", Toast.LENGTH_SHORT).show();
 
             //If ANY Quiz i close enough, return quiz
             if (distance < 10) {
@@ -267,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             MainActivity.this.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
         }
     }
 
