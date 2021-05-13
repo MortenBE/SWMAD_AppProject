@@ -17,4 +17,7 @@
     <string name="location_longitude">"Location latitude: "</string>
     <string name="catch_error">"Error: "</string>
     <string name="quiz_fetch">quiz fetched</string>
+    <string name="request_name_and_try_again">Please write a name, and try again</string>
+    <string name="submittet_score">"Submitted score: "</string>
+    <string name="with_name">" With Name: "</string>
 </resources>

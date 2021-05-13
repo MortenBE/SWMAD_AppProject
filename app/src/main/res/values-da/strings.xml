@@ -17,5 +17,8 @@
     <string name="location_longitude">"Lokation længdegrad: "</string>
     <string name="catch_error">"Fejl: "</string>
     <string name="quiz_fetch">quiz hentet</string>
+    <string name="request_name_and_try_again">Venlig skriv dit navn og prøv igen</string>
+    <string name="submittet_score">"Indsendt score: "</string>
+    <string name="with_name">" Med navn: "</string>
 
 </resources>

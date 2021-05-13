@@ -164,13 +164,13 @@ public class QuizActivity extends AppCompatActivity {
             }
             else
             {
-                Toast.makeText(this, "Please write a name, and try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.request_name_and_try_again), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void postScore() {
-        Toast.makeText(this, "Submitted score: " + score +  " With Name: " +nameInput.getText(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.submittet_score) + score +  getResources().getString(R.string.with_name) +nameInput.getText(), Toast.LENGTH_SHORT).show();
         Score newScore = new Score(nameInput.getText().toString(), score, quizId);
         quizViewModel.addNewScore(newScore);
 
@@ -184,7 +184,7 @@ public class QuizActivity extends AppCompatActivity {
         try {
             QuizActivity.this.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
         }
     }
 

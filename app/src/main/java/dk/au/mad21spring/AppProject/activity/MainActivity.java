@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 MainActivity.this.startActivity(intent);
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(MainActivity.this, "Error" + e, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
             }
 
             return false;
