@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.Manifest;
 import android.content.IntentSender;
@@ -58,6 +60,7 @@ import java.util.List;
 import dk.au.mad21spring.AppProject.R;
 import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.model.Score;
+import dk.au.mad21spring.AppProject.service.LocationService;
 import dk.au.mad21spring.AppProject.viewmodel.MapViewModel;
 import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
@@ -69,13 +72,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     MapViewModel mapViewModel;
 
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
     Circle myPositionCircle;
     Location currentLocation;
 
     public static final int PERMISSIONS_REQUEST_LOCATION = 101;
-    public static final int REQUEST_CHECK_SETTINGS = 201;
     private static final String TAG = "MapsActivity";
 
 
@@ -92,10 +92,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             initLocationTracking();
             initMap();
         });
+        mapViewModel.getCurrentLocation().observe(this, location -> {
+            showPlacementOnMap(location);
+            currentLocation = location;
+        });
 
-
-        // Only first time this should be called.
         //addQuizes();
+    }
+
+    private void startService() {
+        Intent weatherServiceIntent = new Intent(this, LocationService.class);
+        startService(weatherServiceIntent);
     }
 
     private void initWigdets() {
@@ -103,8 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //setting up OnClickListeners
         QuizButton.setOnClickListener(v -> {
-            if(currentLocation != null)
-            {
+            if (currentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 18));
                 ConquerQuiz();
             }
@@ -146,8 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void AddMapMarkers() {
-        for (int i = 0; i< quizzes.size(); i ++)
-        {
+        for (int i = 0; i < quizzes.size(); i++) {
             Log.d(TAG, quizzes.get(i).getDocumentId());
             mMap.addMarker(new MarkerOptions()
                     .snippet(quizzes.get(i).getDocumentId()) //TODO: check if there are better ways to store quizId in marker
@@ -156,8 +161,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addQuizes()
-    {
+    private void addQuizes() {
         Quiz q1 = new Quiz();
         q1.setLatitude(56.1692);
         q1.setLongitude(10.1998);
@@ -199,93 +203,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     ////Location tracking
-    private void initLocationTracking() {
-        //Make a location request
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+    private void showPlacementOnMap(Location location) {
+        if (myPositionCircle == null) {
+            //Add circle to mark current position
+            myPositionCircle = mMap.addCircle(new CircleOptions()
+                    .center(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .radius(5)
+                    .strokeColor(Color.WHITE)
+                    .fillColor(Color.MAGENTA));
 
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    if (myPositionCircle == null) {
-                        //Add circle to mark current position
-                        myPositionCircle = mMap.addCircle(new CircleOptions()
-                                .center(new LatLng(location.getLatitude(), location.getLongitude()))
-                                .radius(5)
-                                .strokeColor(Color.WHITE)
-                                .fillColor(Color.MAGENTA));
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
-                    } else {
-                        //Move circle to match current position
-                        myPositionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
-                    }
-
-                    //Update current location and move camera postion and zoom
-                    currentLocation = location;
-                }
-            }
-            @Override
-            public void onLocationAvailability(LocationAvailability locationAvailability) {
-                Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());
-            }
-        };
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationTracking() {
-        //https://developer.android.com/training/location/change-location-settings
-        //Setting up location request
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(2 * 1000); //The interval should be low for best user experience
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        //Add location settings to location settings
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-
-        //Check whether the current location settings are satisfied
-        SettingsClient client = LocationServices.getSettingsClient(this);
-        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-
-        //Determine whether the location settings are appropriate for the location request
-        task.addOnSuccessListener(this, locationSettingsResponse -> {
-            // All location settings are satisfied. The client can initialize
-            // location requests here.
-            // ...
-        });
-
-        task.addOnFailureListener(this, e -> {
-            if (e instanceof ResolvableApiException) {
-                // Location settings are not satisfied, but this can be fixed
-                // by showing the user a dialog.
-                try {
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
-                    ResolvableApiException resolvable = (ResolvableApiException) e;
-                    resolvable.startResolutionForResult(MainActivity.this,
-                            REQUEST_CHECK_SETTINGS);
-                } catch (IntentSender.SendIntentException sendEx) {
-                    // Ignore the error.
-                }
-            }
-        });
-
-        //Make a location request
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper());
-    }
-
-    //Finds current locations once
-    private void getLocation() {
-        if (fusedLocationClient == null) {
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 18));  //move camera to location
+        } else {
+            //Move circle to match current position
+            myPositionCircle.setCenter(new LatLng(location.getLatitude(), location.getLongitude()));
         }
+    }
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -363,7 +296,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Request permission
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
         } else {
-            startLocationTracking();
+            //startLocationTracking();
+            startService();
         }
     }
 
@@ -372,7 +306,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (requestCode == PERMISSIONS_REQUEST_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // got permission
-                startLocationTracking();
+                //startLocationTracking();
+                startService();
             } else {
                 // permission denied
                 finish();

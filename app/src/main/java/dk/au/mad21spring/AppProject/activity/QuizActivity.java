@@ -179,13 +179,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void goToMapActivity() {
-        Intent intent = new Intent(QuizActivity.this, MainActivity.class);
-
-        try {
-            QuizActivity.this.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
-        }
+        finish();
     }
 
     @SuppressLint("SetTextI18n")

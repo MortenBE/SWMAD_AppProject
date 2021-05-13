@@ -22,7 +22,7 @@ public class ScoreActivity extends AppCompatActivity {
     private static final String TAG = "ScoreActivity";
 
     ScoreViewModel scoreViewModel;
-    String quizId;
+    private String quizId;
 
     ScoreAdapter adapter;
     RecyclerView recyclerView;
@@ -40,7 +40,7 @@ public class ScoreActivity extends AppCompatActivity {
         if(getIntent().hasExtra("quizId")) {
             quizId = getIntent().getStringExtra("quizId");
         } else if(savedInstanceState != null) {
-            savedInstanceState.getString("quizId");
+            quizId = savedInstanceState.getString("quizId");
         }
 
         //Init adapter - Mich//
@@ -82,4 +82,6 @@ public class ScoreActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
     }
+
+
 }

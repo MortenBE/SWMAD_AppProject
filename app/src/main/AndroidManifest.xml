@@ -7,12 +7,12 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the "MyLocation" functionality.
     -->
-    <!--<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -23,8 +23,10 @@
         android:theme="@style/Theme.Group27_MAD21_spring_AppProject"
         android:usesCleartextTraffic="true">
         <service
-            android:name=".service.ShowLocationService"
-            android:foregroundServiceType="location">
+            android:name=".service.LocationService"
+            android:enabled="true"
+            android:exported="false">
+            <!--android:foregroundServiceType="location">-->
         </service>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
