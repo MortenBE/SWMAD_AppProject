@@ -53,9 +53,11 @@ public class LocationService extends Service {
     private static final String TAG = "LocationService";
     public static final int REQUEST_CHECK_SETTINGS = 201;
     public static final int NOTIFICATION_ID = 301;
+    public static final String SERVICE_CHANNEL = "serviceChannel";
     private List<Quiz> quizzes = new ArrayList<>();
     private Boolean notifyForNearbyQuiz = true;
 
+    //For notification: https://stuff.mit.edu/afs/sipb/project/android/docs/training/notify-user/managing.html
     NotificationManager notificationManager;
     NotificationCompat.Builder notificationBuilder;
     Notification notification;
@@ -77,6 +79,17 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        if(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(SERVICE_CHANNEL, "Foreground Service", NotificationManager.IMPORTANCE_LOW);
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+        notificationBuilder = new NotificationCompat.Builder(this, SERVICE_CHANNEL);
+
+        initNotification();
+        startForeground(NOTIFICATION_ID, notification);
+
 
         //Getting serialized quizzes from intent
         String serializedQuizzes = intent.getStringExtra("quizzes");
@@ -113,6 +126,11 @@ public class LocationService extends Service {
                         if(notifyForNearbyQuiz == true) {
                             //Quiz nearby make notification
                             Log.d(TAG, "Quiz nearby make notification");
+                            notification = notificationBuilder
+                                    .setContentTitle("Quiz nearby!")
+                                    .setContentText("There is a quiz nearby")
+                                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                    .build();
 
                         } else {
                             //User has already been notified
@@ -123,9 +141,16 @@ public class LocationService extends Service {
                     else
                     {
                         //No quizzes nearby
+                        notification = notificationBuilder
+                                .setContentTitle("No quizzes nearby!")
+                                .setContentText("There is no quiz nearby")
+                                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .build();
                         notifyForNearbyQuiz = true;
                         Log.d(TAG, "No quizzes nearby");
                     }
+                    notificationManager.notify(NOTIFICATION_ID, notification);
+
                 }
             }
             @Override
@@ -133,6 +158,17 @@ public class LocationService extends Service {
                 Log.d(TAG, "onLocationAvailability: " + locationAvailability.isLocationAvailable());
             }
         };
+
+
+    }
+    private void initNotification()
+    {
+        notification = notificationBuilder
+                .setContentTitle("")
+                .setContentText("")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .build();
+        notificationManager.notify(NOTIFICATION_ID, notification);
     }
 
 
