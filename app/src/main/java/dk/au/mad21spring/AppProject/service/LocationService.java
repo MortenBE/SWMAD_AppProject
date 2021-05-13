@@ -30,38 +30,30 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import dk.au.mad21spring.AppProject.API.QuizModel;
+
 import dk.au.mad21spring.AppProject.R;
-import dk.au.mad21spring.AppProject.activity.MainActivity;
-import dk.au.mad21spring.AppProject.activity.QuizActivity;
 import dk.au.mad21spring.AppProject.database.Repository;
 import dk.au.mad21spring.AppProject.model.Quiz;
 
 public class LocationService extends Service {
 
     private static final String TAG = "LocationService";
-    public static final int REQUEST_CHECK_SETTINGS = 201;
     public static final int NOTIFICATION_ID = 301;
     public static final String SERVICE_CHANNEL = "serviceChannel";
     private List<Quiz> quizzes = new ArrayList<>();
     private Boolean notifyForNearbyQuiz = true;
+    private Location lastLocation;
 
     //For notification: https://stuff.mit.edu/afs/sipb/project/android/docs/training/notify-user/managing.html
     NotificationManager notificationManager;
     NotificationCompat.Builder notificationBuilder;
     Notification notification;
-
 
     Repository repository;
 
@@ -80,6 +72,8 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        lastLocation = new Location("");
+
         if(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel(SERVICE_CHANNEL, "Foreground Service", NotificationManager.IMPORTANCE_LOW);
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -87,9 +81,8 @@ public class LocationService extends Service {
         }
         notificationBuilder = new NotificationCompat.Builder(this, SERVICE_CHANNEL);
 
-        initNotification();
+        initialNotification();
         startForeground(NOTIFICATION_ID, notification);
-
 
         //Getting serialized quizzes from intent
         String serializedQuizzes = intent.getStringExtra("quizzes");
@@ -117,7 +110,12 @@ public class LocationService extends Service {
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Update location in repository
-                    repository.setCurrentLocation(location);
+                    if(location.getLatitude() != lastLocation.getLatitude() && location.getLongitude() != lastLocation.getLongitude())
+                    {
+                        repository.setCurrentLocation(location);
+                    }
+                    lastLocation = location;
+
 
                     Boolean quizNearby = CheckForNearbyQuiz(location);
 
@@ -125,7 +123,6 @@ public class LocationService extends Service {
                     {
                         if(notifyForNearbyQuiz == true) {
                             //Quiz nearby make notification
-                            Log.d(TAG, "Quiz nearby make notification");
                             notification = notificationBuilder
                                     .setContentTitle("Quiz nearby!")
                                     .setContentText("There is a quiz nearby")
@@ -133,8 +130,8 @@ public class LocationService extends Service {
                                     .build();
 
                         } else {
-                            //User has already been notified
-                            Log.d(TAG, "User has already been notified");
+                            //User has already been notified do nothing
+
                         }
                         notifyForNearbyQuiz = false;
                     }
@@ -146,8 +143,9 @@ public class LocationService extends Service {
                                 .setContentText("There is no quiz nearby")
                                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                                 .build();
+
                         notifyForNearbyQuiz = true;
-                        Log.d(TAG, "No quizzes nearby");
+
                     }
                     notificationManager.notify(NOTIFICATION_ID, notification);
 
@@ -161,7 +159,7 @@ public class LocationService extends Service {
 
 
     }
-    private void initNotification()
+    private void initialNotification()
     {
         notification = notificationBuilder
                 .setContentTitle("")
@@ -170,8 +168,6 @@ public class LocationService extends Service {
                 .build();
         notificationManager.notify(NOTIFICATION_ID, notification);
     }
-
-
 
     @SuppressLint("MissingPermission")
     private void startLocationTracking() {
@@ -229,8 +225,4 @@ public class LocationService extends Service {
 
         return (dist);
     }
-
-
-
-
 }
