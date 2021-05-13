@@ -5,11 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,18 +19,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import dk.au.mad21spring.AppProject.API.QuizAPI;
 import dk.au.mad21spring.AppProject.API.QuizModel;
 import dk.au.mad21spring.AppProject.R;
 import org.apache.commons.text.StringEscapeUtils;
 
-import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.model.Score;
 import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
@@ -46,7 +39,6 @@ public class QuizActivity extends AppCompatActivity {
     RadioButton quiz01, quiz02, quiz03, quiz04;
     RadioGroup radioGroup;
     TextView Question, scoreText;
-    QuizAPI quizAPI;
     Button submitBtn;
     EditText nameInput;
 
@@ -106,7 +98,6 @@ public class QuizActivity extends AppCompatActivity {
                 category = myQuiz .getCategory();
 
                 //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
-                quizAPI = new QuizAPI(getApplication());
                 getQuiz();
         });
 
