@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -105,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //addQuizes();
     }
 
-    private void startService() {
-        Intent weatherServiceIntent = new Intent(this, LocationService.class);
-        startService(weatherServiceIntent);
-    }
-
     private void initWigdets() {
         QuizButton = findViewById(R.id.MainQuizButton);
 
@@ -119,10 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 18));
                 ConquerQuiz();
             }
-
-
         });
-
     }
 
     ////Map
@@ -307,6 +300,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 finish();
             }
         }
+    }
+
+    private void startService() {
+        Gson gson = new Gson();
+
+        String serializedQuizzes = gson.toJson(quizzes);
+        Intent weatherServiceIntent = new Intent(this, LocationService.class);
+        weatherServiceIntent.putExtra("quizzes", serializedQuizzes);
+
+        startService(weatherServiceIntent);
     }
 }
 

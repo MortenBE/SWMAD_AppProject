@@ -1,6 +1,7 @@
 package dk.au.mad21spring.AppProject.service;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -14,6 +15,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 
 import androidx.core.app.NotificationCompat;
 
@@ -31,17 +34,32 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import dk.au.mad21spring.AppProject.API.QuizModel;
+import dk.au.mad21spring.AppProject.R;
 import dk.au.mad21spring.AppProject.activity.MainActivity;
+import dk.au.mad21spring.AppProject.activity.QuizActivity;
 import dk.au.mad21spring.AppProject.database.Repository;
+import dk.au.mad21spring.AppProject.model.Quiz;
 
 public class LocationService extends Service {
 
     private static final String TAG = "LocationService";
     public static final int REQUEST_CHECK_SETTINGS = 201;
+    public static final int NOTIFICATION_ID = 301;
+    private List<Quiz> quizzes = new ArrayList<>();
+    private Boolean notifyForNearbyQuiz = true;
+
+    NotificationManager notificationManager;
+    NotificationCompat.Builder notificationBuilder;
+    Notification notification;
+
 
     Repository repository;
 
@@ -55,12 +73,18 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "On Create");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "On start");
+
+        //Getting serialized quizzes from intent
+        String serializedQuizzes = intent.getStringExtra("quizzes");
+
+        //Deserializing quizzes
+        Type listOfMyClassObject = new TypeToken<ArrayList<Quiz>>() {}.getType();
+        quizzes = new Gson().fromJson(serializedQuizzes, listOfMyClassObject);
+
         initLocationTracking();
         startLocationTracking();
 
@@ -80,9 +104,27 @@ public class LocationService extends Service {
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Update location in repository
-                    if(location != null)
+                    repository.setCurrentLocation(location);
+
+                    Boolean quizNearby = CheckForNearbyQuiz(location);
+
+                    if(quizNearby == true)
                     {
-                        repository.setCurrentLocation(location);
+                        if(notifyForNearbyQuiz == true) {
+                            //Quiz nearby make notification
+                            Log.d(TAG, "Quiz nearby make notification");
+
+                        } else {
+                            //User has already been notified
+                            Log.d(TAG, "User has already been notified");
+                        }
+                        notifyForNearbyQuiz = false;
+                    }
+                    else
+                    {
+                        //No quizzes nearby
+                        notifyForNearbyQuiz = true;
+                        Log.d(TAG, "No quizzes nearby");
                     }
                 }
             }
@@ -92,6 +134,8 @@ public class LocationService extends Service {
             }
         };
     }
+
+
 
     @SuppressLint("MissingPermission")
     private void startLocationTracking() {
@@ -118,6 +162,36 @@ public class LocationService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private Boolean CheckForNearbyQuiz(Location currentLocation) {
+        double distance;
+
+        for (int i = 0; i < quizzes.size(); i++) {
+            //Distance from current location
+            distance = calculateDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude());
+
+            //If ANY Quiz i close enough
+            if (distance < 10) {
+                return true;
+            }
+        }
+
+        //If no quizzes are near
+        return false;
+    }
+
+    //https://www.geodatasource.com/developers/java
+    ////Gets two coordinates calculates the distance between i meters
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+        dist = Math.acos(dist);
+        dist = Math.toDegrees(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344 * 1000; //Distance in meters
+
+        return (dist);
     }
 
 
