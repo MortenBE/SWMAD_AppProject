@@ -1,5 +1,6 @@
 package dk.au.mad21spring.AppProject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -22,6 +23,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +42,7 @@ public class QuizActivity extends AppCompatActivity {
     //ViewModels
     QuizViewModel quizViewModel;
 
+    // Widgets
     RadioButton quiz01, quiz02, quiz03, quiz04;
     RadioGroup radioGroup;
     TextView Question, scoreText;
@@ -47,10 +50,11 @@ public class QuizActivity extends AppCompatActivity {
     Button submitBtn;
     EditText nameInput;
 
+    // Fields
+    String[] questionsArr;
     private int questionCounter, questionCountTotal;
     private QuizModel quiz;
     private int score = 0;
-    private String name;
     private String difficultly, category, quizId;
 
 
@@ -61,19 +65,39 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz);
 
         quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
-        getQuizSettings();
-        /*
-        quizAPI = new QuizAPI(getApplication());
+
         setupWidgets();
         setupListener();
         hideUI();
-        getQuiz();
-         */
+
+        if(savedInstanceState != null)
+        {
+            Gson gson = new Gson();
+            quiz = gson.fromJson( savedInstanceState.getString("QuizModel"),QuizModel.class);
+            Toast.makeText(this, quiz.getResults().get(1).getQuestion(), Toast.LENGTH_SHORT).show();
+            questionCounter = savedInstanceState.getInt("questionCounter");
+            quizId = savedInstanceState.getString("QuizId");
+            score = savedInstanceState.getInt("score");
+            setQuestion(questionCounter);
+            showQuizUI();
+        }
+
+        else
+        {
+            getQuizSettings();
+        }
+    }
+
+    private void showQuizUI() {
+        quiz01.setVisibility(View.VISIBLE);
+        quiz02.setVisibility(View.VISIBLE);
+        quiz03.setVisibility(View.VISIBLE);
+        quiz04.setVisibility(View.VISIBLE);
+        Question.setVisibility(View.VISIBLE);
     }
 
     private void getQuizSettings() {
 
-        Intent intent = getIntent();
         if(getIntent().hasExtra("quizId"))
         {
             quizViewModel.GetQuiz(getIntent().getStringExtra("quizId")).observe(this, myQuiz -> {
@@ -83,9 +107,6 @@ public class QuizActivity extends AppCompatActivity {
 
                 //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
                 quizAPI = new QuizAPI(getApplication());
-                setupWidgets();
-                setupListener();
-                hideUI();
                 getQuiz();
         });
 
@@ -109,26 +130,21 @@ public class QuizActivity extends AppCompatActivity {
 
     private void setQuestion(int questionCounter) {
 
-        String[] questionsArr = new String[4];
-
-        quiz01.setTextColor(Color.BLACK);
-        quiz02.setTextColor(Color.BLACK);
-        quiz03.setTextColor(Color.BLACK);
-        quiz04.setTextColor(Color.BLACK);
-
+        questionsArr = new String[4];
 
         questionsArr[0] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getCorrectAnswer());
         questionsArr[1] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(0));
         questionsArr[2] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(1));
         questionsArr[3] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(2));
 
-
-
         List<String> tempList = Arrays.asList(questionsArr);
         Collections.shuffle(tempList);
         tempList.toArray(questionsArr);
 
+        setUI();
+    }
 
+    private void setUI() {
         Question.setText(StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getQuestion()));
         quiz01.setText(questionsArr[0]);
         quiz02.setText(questionsArr[1]);
@@ -242,15 +258,22 @@ public class QuizActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     quiz = gson.fromJson(response, QuizModel.class);
                     setQuestion(questionCounter);
-                    quiz01.setVisibility(View.VISIBLE);
-                    quiz02.setVisibility(View.VISIBLE);
-                    quiz03.setVisibility(View.VISIBLE);
-                    quiz04.setVisibility(View.VISIBLE);
-                    Question.setVisibility(View.VISIBLE);
+                    showQuizUI();
 
                     // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                 },
                 error -> Toast.makeText(getApplication().getApplicationContext(), "Error while fetching quiz" + error.getMessage(),  Toast.LENGTH_SHORT).show());
         queue.add(stringRequest);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Gson gson = new Gson();
+
+        outState.putString("QuizModel",gson.toJson(quiz));
+        outState.putInt("questionCounter", questionCounter);
+        outState.putInt("score", score);
+        outState.putString("QuizId", quizId);
     }
 }
