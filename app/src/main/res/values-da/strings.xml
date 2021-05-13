@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Group27_MAD21_spring_AppProject</string>
+    <string name="insert_name">Indsæt navn:</string>
+    <string name="quiz_question">Quiz spørgsmål</string>
+    <string name="submit_score">Indsend score</string>
+    <string name="quiz_score1">"Quiz færdig, du fik: "</string>
+    <string name="quiz_score2">" ud af 4 spørgsmål korrekt indtast navn og indsend score"</string>
+    <string name="correct_answer">Svaret er korrekt!</string>
+    <string name="wrong_answer">"Forkert svar, det korrekt svar var: "</string>
+    <string name="error_while_fetch_api">Fejl ved indlæsning af quiz</string>
+    <string name="player_name">"Spiller: "</string>
+    <string name="player_score">", Point: "</string>
+    <string name="distance_m">"Afstand: "</string>
+    <string name="no_quizzes_near">Ingen quiz i nærheden</string>
+    <string name="location_latitude">"Lokation breddegrad: "</string>
+    <string name="location_longitude">"Lokation længdegrad: "</string>
+    <string name="catch_error">"Fejl: "</string>
+    <string name="quiz_fetch">quiz hentet</string>
+
+</resources>

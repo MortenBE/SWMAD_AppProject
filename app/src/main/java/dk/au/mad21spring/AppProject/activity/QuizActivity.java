@@ -196,7 +196,7 @@ public class QuizActivity extends AppCompatActivity {
             setQuestion(questionCounter);
         }
         else{
-            scoreText.setText("Quiz done, you got: " + score + " out of 4 questions correct, input name and submit score below");
+            scoreText.setText(getResources().getString(R.string.quiz_score1) + score + getResources().getString(R.string.quiz_score2));
             scoreText.setVisibility(View.VISIBLE);
             submitBtn.setVisibility(View.VISIBLE);
             nameInput.setVisibility(View.VISIBLE);
@@ -213,11 +213,11 @@ public class QuizActivity extends AppCompatActivity {
 
         if (checkedButton.getText().equals(quiz.getResults().get(questionCounter).getCorrectAnswer()))
         {
-            Toast.makeText(this, "Correct Answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.correct_answer), Toast.LENGTH_SHORT).show();
             score ++;
         }
         else {
-            Toast.makeText(this, "Wrong Answer, correct answer was: " + quiz.getResults().get(questionCounter).getCorrectAnswer()+"a", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.wrong_answer) + quiz.getResults().get(questionCounter).getCorrectAnswer()+"a", Toast.LENGTH_LONG).show();
         }
         checkedButton.setChecked(false);
         nextQuestion();
@@ -262,7 +262,7 @@ public class QuizActivity extends AppCompatActivity {
 
                     // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                 },
-                error -> Toast.makeText(getApplication().getApplicationContext(), "Error while fetching quiz" + error.getMessage(),  Toast.LENGTH_SHORT).show());
+                error -> Toast.makeText(getApplication().getApplicationContext(), getResources().getString(R.string.error_while_fetch_api) + error.getMessage(),  Toast.LENGTH_SHORT).show());
         queue.add(stringRequest);
     }
 

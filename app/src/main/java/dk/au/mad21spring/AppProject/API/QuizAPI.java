@@ -8,6 +8,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import dk.au.mad21spring.AppProject.R;
+
 public class QuizAPI {
 
         private final Application app;
@@ -29,9 +31,9 @@ public class QuizAPI {
                         // Deserializing result
                         Gson gson = new Gson();
                         QuizModel quiz = gson.fromJson(response, QuizModel.class);
-                        Toast.makeText(app.getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app.getApplicationContext(), app.getResources().getString(R.string.quiz_fetch) + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                     },
-                    error -> Toast.makeText(app.getApplicationContext(), "Error while fetching quiz" + error.getMessage(),  Toast.LENGTH_SHORT).show());
+                    error -> Toast.makeText(app.getApplicationContext(), app.getResources().getString(R.string.catch_error) + error.getMessage(),  Toast.LENGTH_SHORT).show());
             queue.add(stringRequest);
         }
 }

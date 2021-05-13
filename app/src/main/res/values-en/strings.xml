@@ -1,19 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Group27_MAD21_spring_AppProject</string>
-    <string name="insert_name">Insert name:</string>
-    <string name="quiz_question">Quiz question</string>
-    <string name="submit_score">Submit score</string>
     <string name="quiz_score1">Quiz done, you got:</string>
     <string name="quiz_score2">out of 4 questions correct, input name and submit score below</string>
+    <string name="submit_score">Submit score</string>
+    <string name="quiz_question">Quiz question</string>
+    <string name="insert_name">Insert name:</string>
     <string name="correct_answer">Correct answer</string>
     <string name="wrong_answer">"Wrong Answer, correct answer was:  "</string>
     <string name="error_while_fetch_api">Error while fetching quiz</string>
     <string name="player_name">"Player: "</string>
     <string name="player_score">", Score: "</string>
-    <string name="distance_m">Distance:</string>
+    <string name="distance_m">"Distance: "</string>
     <string name="no_quizzes_near">No quizzes near</string>
-    <string name="location_latitude">Location latitude:</string>
-    <string name="location_longitude">Location longitude:</string>
-    <string name="catch_error">Error:</string>
+    <string name="location_latitude">"Location latitude: "</string>
+    <string name="location_longitude">"Location latitude: "</string>
+    <string name="catch_error">"Error: "</string>
     <string name="quiz_fetch">quiz fetched</string>
 </resources>

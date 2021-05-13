@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         // Logic to handle location object
-                        Toast.makeText(MainActivity.this, "Location latitude: " + location.getLatitude() + "Location longitude: " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.location_latitude) + location.getLatitude() + getResources().getString(R.string.location_longitude) + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Quiz quiz = FindNearbyQuiz();
 
         if (quiz == null) {
-            Toast.makeText(this, "No quizzes near", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.no_quizzes_near), Toast.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(MainActivity.this, QuizActivity.class);
             intent.putExtra("quizId", quiz.getDocumentId());
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Distance from current location
             distance = calculateDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude());
 
-            Toast.makeText(this, "Distance: " + distance + "m", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.distance_m) + distance + "m", Toast.LENGTH_SHORT).show();
 
             //If ANY Quiz i close enough, return quiz
             if (distance < 10) {
@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             MainActivity.this.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "Error" + e, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
         }
     }
 

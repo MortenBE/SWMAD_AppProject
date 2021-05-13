@@ -68,7 +68,7 @@ public class ScoreActivity extends AppCompatActivity {
     private void updateUI() {
         for (int j = 0; j < highscores.size(); j ++)
         {
-            Toast.makeText(this, (j + 1) + ": Player: " + highscores.get(j).quizzersName + ", Score: " + highscores.get(j).getScore(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, (j + 1) + getResources().getString(R.string.player_name) + highscores.get(j).quizzersName + getResources().getString(R.string.player_score) + highscores.get(j).getScore(), Toast.LENGTH_SHORT).show();
         }
     }
 
