@@ -124,9 +124,9 @@ public class LocationService extends Service {
                         if(notifyForNearbyQuiz == true) {
                             //Quiz nearby make notification
                             notification = notificationBuilder
-                                    .setContentTitle("Quiz nearby!")
-                                    .setContentText("There is a quiz nearby")
-                                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                    .setContentTitle(getResources().getString(R.string.notificationQuizNear_Title))
+                                    .setContentText(getResources().getString(R.string.notificationQuizNear_Text))
+                                    .setSmallIcon(R.mipmap.ic_launcher_quizapp)
                                     .build();
 
                         } else {
@@ -139,9 +139,9 @@ public class LocationService extends Service {
                     {
                         //No quizzes nearby
                         notification = notificationBuilder
-                                .setContentTitle("No quizzes nearby!")
-                                .setContentText("There is no quiz nearby")
-                                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .setContentTitle(getResources().getString(R.string.notificationNoQuiz_Title))
+                                .setContentText(getResources().getString(R.string.notificationNoQuiz_Text))
+                                .setSmallIcon(R.mipmap.ic_launcher_quizapp)
                                 .build();
 
                         notifyForNearbyQuiz = true;
@@ -164,7 +164,7 @@ public class LocationService extends Service {
         notification = notificationBuilder
                 .setContentTitle("")
                 .setContentText("")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.mipmap.ic_launcher_quizapp)
                 .build();
         notificationManager.notify(NOTIFICATION_ID, notification);
     }

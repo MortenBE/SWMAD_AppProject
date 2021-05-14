@@ -21,5 +21,9 @@
     <string name="submittet_score">"Indsendt score: "</string>
     <string name="with_name">" Med navn: "</string>
     <string name="quiz">Quiz</string>
+    <string name="notificationNoQuiz_Title">Ingen quizzer i nærheden!</string>
+    <string name="notificationNoQuiz_Text">Der er ingen quizzer i nærheden. Gå til en anden placering</string>
+    <string name="notificationQuizNear_Title">Quiz i nærheden!</string>
+    <string name="notificationQuizNear_Text">Der er en quiz i nærheden, som du kan erobre</string>
 
 </resources>

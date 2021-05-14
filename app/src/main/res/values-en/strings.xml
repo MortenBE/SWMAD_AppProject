@@ -21,4 +21,8 @@
     <string name="submittet_score">"Submitted score: "</string>
     <string name="with_name">" With Name: "</string>
     <string name="quiz">Quiz</string>
+    <string name="notificationNoQuiz_Title">No quizzes nearby!</string>
+    <string name="notificationNoQuiz_Text">There is no quizzes nearby. Move to a different location</string>
+    <string name="notificationQuizNear_Title">Quiz nearby!</string>
+    <string name="notificationQuizNear_Text">There is a quiz nearby you can conquer</string>
 </resources>

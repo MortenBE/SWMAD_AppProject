@@ -20,4 +20,9 @@
     <string name="submittet_score">Submitted score:</string>
     <string name="with_name">With Name:</string>
     <string name="quiz">Quiz</string>
+    <string name="notificationNoQuiz_Title">Quiz</string>
+    <string name="notificationNoQuiz_Text">Quiz</string>
+    <string name="notificationQuizNear_Title">Quiz</string>
+    <string name="notificationQuizNear_Text">Quiz</string>
+
 </resources>
