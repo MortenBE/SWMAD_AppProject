@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Group27_MAD21_spring_AppProject</string>
+    <string name="app_name">Quiz N Conquer</string>
     <string name="quiz_score1">Quiz done, you got:</string>
     <string name="quiz_score2">out of 4 questions correct, input name and submit score below</string>
     <string name="submit_score">Submit score</string>
