@@ -50,36 +50,42 @@ public class QuizActivity extends AppCompatActivity {
     private String difficultly, category, quizId;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
 
+        // Get View Model, and setup UI and listeners.
         quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
-
         setupWidgets();
         setupListener();
         hideUI();
 
+        // Check if there is a saved state. If there is, this state should be used
         if(savedInstanceState != null)
         {
-            Gson gson = new Gson();
-            quiz = gson.fromJson( savedInstanceState.getString("QuizModel"),QuizModel.class);
-            questionCounter = savedInstanceState.getInt("questionCounter");
-            quizId = savedInstanceState.getString("QuizId");
-            score = savedInstanceState.getInt("score");
-            setQuestion(questionCounter);
-            showQuizUI();
+            handleSavedState(savedInstanceState);
         }
 
+        // If there isn't a saved state, we want to start a new quiz.
         else
         {
             getQuizSettings();
         }
     }
 
+    private void handleSavedState(Bundle savedInstanceState) {
+        Gson gson = new Gson();
+        quiz = gson.fromJson( savedInstanceState.getString("QuizModel"),QuizModel.class);
+        questionCounter = savedInstanceState.getInt("questionCounter");
+        quizId = savedInstanceState.getString("QuizId");
+        score = savedInstanceState.getInt("score");
+        setQuestion(questionCounter);
+        showQuizUI();
+    }
+
     private void showQuizUI() {
+        // Set quiz UI to visible
         quiz01.setVisibility(View.VISIBLE);
         quiz02.setVisibility(View.VISIBLE);
         quiz03.setVisibility(View.VISIBLE);
@@ -89,14 +95,13 @@ public class QuizActivity extends AppCompatActivity {
 
     private void getQuizSettings() {
 
+        // Settings for quiz are set here
         if(getIntent().hasExtra("quizId"))
         {
             quizViewModel.GetQuiz(getIntent().getStringExtra("quizId")).observe(this, myQuiz -> {
                 quizId = myQuiz.getDocumentId();
                 difficultly = myQuiz.getDifficulity();
                 category = myQuiz .getCategory();
-
-                //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
                 getQuiz();
         });
         }
@@ -105,7 +110,7 @@ public class QuizActivity extends AppCompatActivity {
 
 
     private void hideUI() {
-
+        // Hide UI from screen, so it can be made visible when needed.
         scoreText.setVisibility(View.GONE);
         submitBtn.setVisibility(View.GONE);
         nameInput.setVisibility(View.GONE);
@@ -116,10 +121,11 @@ public class QuizActivity extends AppCompatActivity {
         Question.setVisibility(View.GONE);
     }
 
+
     private void setQuestion(int questionCounter) {
 
+        // Creates an array with the questions for the quiz, and shuffles the questions in the array
         questionsArr = new String[4];
-
         questionsArr[0] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getCorrectAnswer());
         questionsArr[1] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(0));
         questionsArr[2] = StringEscapeUtils.unescapeHtml4(quiz.getResults().get(questionCounter).getIncorrectAnswers().get(1));
@@ -141,9 +147,12 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void setupListener() {
+        // Setup the radiogroup listeners, we want to know which is pressed, and use that information
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             checkResult(checkedId);
         });
+
+        // Setup Submit button listener to postscore and go back to map.
         submitBtn.setOnClickListener(v -> {
             if (!nameInput.getText().toString().isEmpty())
             {
@@ -161,16 +170,12 @@ public class QuizActivity extends AppCompatActivity {
         Toast.makeText(this, getResources().getString(R.string.submittet_score) + score +  getResources().getString(R.string.with_name) +nameInput.getText(), Toast.LENGTH_SHORT).show();
         Score newScore = new Score(nameInput.getText().toString(), score, quizId);
         quizViewModel.addNewScore(newScore);
-
-
     }
 
 
     private void goToMapActivity() {
         finish();
     }
-
-    @SuppressLint("SetTextI18n")
     private void nextQuestion() {
         if (questionCounter < questionCountTotal)
         {
@@ -193,14 +198,17 @@ public class QuizActivity extends AppCompatActivity {
     private void checkResult(int Id) {
         RadioButton checkedButton = findViewById(Id);
 
+        // We want to know if the checked button is the correct answer, if it is, score is incremented. Toasts for telling the user if correct or not
         if (checkedButton.getText().equals(quiz.getResults().get(questionCounter).getCorrectAnswer()))
         {
             Toast.makeText(this, getResources().getString(R.string.correct_answer), Toast.LENGTH_SHORT).show();
             score ++;
         }
         else {
-            Toast.makeText(this, getResources().getString(R.string.wrong_answer) + quiz.getResults().get(questionCounter).getCorrectAnswer()+"a", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.wrong_answer) + quiz.getResults().get(questionCounter).getCorrectAnswer(), Toast.LENGTH_LONG).show();
         }
+
+        // Set button unChecked and next question
         checkedButton.setChecked(false);
         nextQuestion();
     }
@@ -215,7 +223,6 @@ public class QuizActivity extends AppCompatActivity {
         Question = findViewById(R.id.questionText);
         submitBtn = findViewById(R.id.submitScoreBtn);
         nameInput = findViewById(R.id.NameScoreQuiz);
-
 
         questionCounter = 0;
         questionCountTotal = 3;
@@ -241,13 +248,12 @@ public class QuizActivity extends AppCompatActivity {
                     quiz = gson.fromJson(response, QuizModel.class);
                     setQuestion(questionCounter);
                     showQuizUI();
-
-                    // Toast.makeText(getApplication().getApplicationContext(), "quiz fetched" + quiz.getResults().get(0).getCategory(),  Toast.LENGTH_SHORT).show();
                 },
                 error -> Toast.makeText(getApplication().getApplicationContext(), getResources().getString(R.string.error_while_fetch_api) + error.getMessage(),  Toast.LENGTH_SHORT).show());
         queue.add(stringRequest);
     }
 
+    // We would like to save the state of the ongoing quiz. If the phone is rotated the quiz should not start from question one, or get a new quiz.
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);

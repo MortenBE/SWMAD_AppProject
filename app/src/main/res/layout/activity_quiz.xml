@@ -47,12 +47,12 @@
 
     <TextView
         android:id="@+id/questionText"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_width="298dp"
+        android:layout_height="139dp"
         android:layout_marginTop="120dp"
         android:hint="@string/quiz_question"
-        android:textStyle="bold"
         android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

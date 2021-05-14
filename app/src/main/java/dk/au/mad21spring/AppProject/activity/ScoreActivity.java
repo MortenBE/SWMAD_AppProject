@@ -42,7 +42,7 @@ public class ScoreActivity extends AppCompatActivity {
             quizId = savedInstanceState.getString("quizId");
         }
 
-        //Init adapter - Mich//
+        //Init adapter
         adapter = new ScoreAdapter(this);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
