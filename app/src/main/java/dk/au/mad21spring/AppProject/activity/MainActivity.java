@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         AddMapMarkers();
         QuizButton.setEnabled(true);
         mMap.setOnMarkerClickListener(marker -> {
-            Toast.makeText(MainActivity.this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
             intent.putExtra("quizId", marker.getSnippet());
@@ -129,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (ActivityNotFoundException e) {
                 Toast.makeText(MainActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
             }
-
-
 
             return false;
         });
@@ -158,38 +155,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
                     .icon(markerIcon));
         }
-    }
-
-
-    private void addQuizes() {
-        Quiz q1 = new Quiz();
-        q1.setLatitude(56.1692);
-        q1.setLongitude(10.1998);
-        q1.setCategory("24");
-        q1.setDifficulity("medium");
-
-        Quiz q2 = new Quiz();
-        q2.setLatitude(56.1700);
-        q2.setLongitude(10.1992);
-        q2.setCategory("26");
-        q2.setDifficulity("medium");
-
-        Quiz q3 = new Quiz();
-        q1.setLatitude(56.1695);
-        q1.setLongitude(10.2000);
-        q1.setCategory("20");
-        q1.setDifficulity("hard");
-
-        Quiz q4 = new Quiz();
-        q2.setLatitude(56.1692);
-        q2.setLongitude(10.1988);
-        q2.setCategory("19");
-        q2.setDifficulity("easy");
-
-        mapViewModel.addQuiz(q1);
-        mapViewModel.addQuiz(q2);
-        mapViewModel.addQuiz(q3);
-        mapViewModel.addQuiz(q4);
     }
 
     //No original code here. All come from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
@@ -254,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Distance from current location
             distance = calculateDistance(currentLocation.getLatitude(), currentLocation.getLongitude(), quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude());
 
-            Toast.makeText(this, getResources().getString(R.string.distance_m) + distance + "m", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, getResources().getString(R.string.distance_m) + distance + "m", Toast.LENGTH_SHORT).show();
 
             //If ANY Quiz i close enough, return quiz
             if (distance < 10) {
@@ -322,6 +287,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         weatherServiceIntent.putExtra("quizzes", serializedQuizzes);
 
         startService(weatherServiceIntent);
+    }
+
+
+    private void addQuizes() {
+        Quiz q1 = new Quiz();
+        q1.setLatitude(56.1692);
+        q1.setLongitude(10.1998);
+        q1.setCategory("24");
+        q1.setDifficulity("medium");
+
+        Quiz q2 = new Quiz();
+        q2.setLatitude(56.1700);
+        q2.setLongitude(10.1992);
+        q2.setCategory("26");
+        q2.setDifficulity("medium");
+
+        Quiz q3 = new Quiz();
+        q1.setLatitude(56.1695);
+        q1.setLongitude(10.2000);
+        q1.setCategory("20");
+        q1.setDifficulity("hard");
+
+        Quiz q4 = new Quiz();
+        q2.setLatitude(56.1692);
+        q2.setLongitude(10.1988);
+        q2.setCategory("19");
+        q2.setDifficulity("easy");
+
+        mapViewModel.addQuiz(q1);
+        mapViewModel.addQuiz(q2);
+        mapViewModel.addQuiz(q3);
+        mapViewModel.addQuiz(q4);
     }
 }
 

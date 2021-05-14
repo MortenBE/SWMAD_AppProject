@@ -66,7 +66,6 @@ public class QuizActivity extends AppCompatActivity {
         {
             Gson gson = new Gson();
             quiz = gson.fromJson( savedInstanceState.getString("QuizModel"),QuizModel.class);
-            Toast.makeText(this, quiz.getResults().get(1).getQuestion(), Toast.LENGTH_SHORT).show();
             questionCounter = savedInstanceState.getInt("questionCounter");
             quizId = savedInstanceState.getString("QuizId");
             score = savedInstanceState.getInt("score");
@@ -100,8 +99,6 @@ public class QuizActivity extends AppCompatActivity {
                 //TODO: all this should be moved back. Only moved it here because i have problems with firebase async
                 getQuiz();
         });
-
-            Toast.makeText(this, "" + quizId, Toast.LENGTH_SHORT).show();
         }
 
     }

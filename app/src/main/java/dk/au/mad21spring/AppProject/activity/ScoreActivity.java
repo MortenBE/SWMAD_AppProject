@@ -28,7 +28,6 @@ public class ScoreActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     //Button viewScoreBtn;
 
-
     private List<Score> highscores;
 
     @Override
@@ -55,21 +54,7 @@ public class ScoreActivity extends AppCompatActivity {
         //Setup observer for quiz highscores
         scoreViewModel.getScores(quizId).observe(this, scores -> {
             adapter.setScores(scores);
-            highscores = scores;
-            //Do something with the scores
-            updateUI();
         });
-    }
-
-    private void initWidgets(){
-
-    }
-
-    private void updateUI() {
-        for (int j = 0; j < highscores.size(); j ++)
-        {
-            Toast.makeText(this, (j + 1) + getResources().getString(R.string.player_name) + highscores.get(j).quizzersName + getResources().getString(R.string.player_score) + highscores.get(j).getScore(), Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
