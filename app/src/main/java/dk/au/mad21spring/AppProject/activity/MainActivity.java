@@ -137,12 +137,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void AddMapMarkers() {
+        BitmapDescriptor hardMarker = BitmapFromVector(getApplicationContext(), R.drawable.ic_marker_hard);
+        BitmapDescriptor mediumMarker = BitmapFromVector(getApplicationContext(), R.drawable.ic_marker_medium);
+        BitmapDescriptor easyMarker = BitmapFromVector(getApplicationContext(), R.drawable.ic_marker_easy);
+
         for (int i = 0; i < quizzes.size(); i++) {
-            Log.d(TAG, quizzes.get(i).getDocumentId());
+
+            //Set marker color (this can be done smarter)
+            BitmapDescriptor markerIcon;
+            if (quizzes.get(i).getDifficulity().equals("easy")) {
+                markerIcon = easyMarker;
+            } else if (quizzes.get(i).getDifficulity().equals("medium")) {
+                markerIcon = mediumMarker;
+            } else {
+                markerIcon = hardMarker;
+            }
+
             mMap.addMarker(new MarkerOptions()
                     .snippet(quizzes.get(i).getDocumentId()) //TODO: check if there are better ways to store quizId in marker
                     .position(new LatLng(quizzes.get(i).getLatitude(), quizzes.get(i).getLongitude()))
-                    .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_grade_24)));
+                    .icon(markerIcon));
         }
     }
 
@@ -178,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapViewModel.addQuiz(q4);
     }
 
-    //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
+    //No original code here. All come from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
         // below line is use to generate a drawable.
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
