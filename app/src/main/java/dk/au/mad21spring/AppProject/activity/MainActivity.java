@@ -1,14 +1,9 @@
 package dk.au.mad21spring.AppProject.activity;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.Manifest;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,16 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,11 +21,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 
 import androidx.core.app.ActivityCompat;
@@ -49,7 +31,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -60,10 +41,8 @@ import java.util.List;
 
 import dk.au.mad21spring.AppProject.R;
 import dk.au.mad21spring.AppProject.model.Quiz;
-import dk.au.mad21spring.AppProject.model.Score;
 import dk.au.mad21spring.AppProject.service.LocationService;
 import dk.au.mad21spring.AppProject.viewmodel.MapViewModel;
-import dk.au.mad21spring.AppProject.viewmodel.QuizViewModel;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -100,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             currentLocation = location;
         });
-
-        //addQuizes();
     }
 
     private void initWigdets() {
@@ -126,6 +103,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        boolean success = mMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                        this, R.raw.maps_style));
+
+        if (!success) {
+            Log.e(TAG, "Style parsing failed.");
+        }
+
         mapReady = true;
 
         checkLocationPermission();
@@ -160,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
     private void addQuizes() {
         Quiz q1 = new Quiz();
         q1.setLatitude(56.1692);
@@ -173,10 +160,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         q2.setCategory("26");
         q2.setDifficulity("medium");
 
+        Quiz q3 = new Quiz();
+        q1.setLatitude(56.1695);
+        q1.setLongitude(10.2000);
+        q1.setCategory("20");
+        q1.setDifficulity("hard");
+
+        Quiz q4 = new Quiz();
+        q2.setLatitude(56.1692);
+        q2.setLongitude(10.1988);
+        q2.setCategory("19");
+        q2.setDifficulity("easy");
+
         mapViewModel.addQuiz(q1);
         mapViewModel.addQuiz(q2);
+        mapViewModel.addQuiz(q3);
+        mapViewModel.addQuiz(q4);
     }
-
 
     //Taken from https://www.geeksforgeeks.org/how-to-add-custom-marker-to-google-maps-in-android/
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
