@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Group27_MAD21_spring_AppProject</string>
+    <string name="app_name">Quiz N Conquer</string>
     <string name="insert_name">Indsæt navn:</string>
     <string name="quiz_question">Quiz spørgsmål</string>
     <string name="submit_score">Indsend score</string>

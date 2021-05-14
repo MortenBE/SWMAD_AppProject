@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Group27_MAD21_spring_AppProject</string>
+    <string name="app_name">Quiz N Conquer</string>
     <string name="insert_name">Insert name:</string>
     <string name="quiz_question">Quiz question</string>
     <string name="submit_score">Submit score</string>

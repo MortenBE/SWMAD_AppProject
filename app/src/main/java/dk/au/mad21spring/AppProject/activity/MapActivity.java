@@ -44,7 +44,7 @@ import dk.au.mad21spring.AppProject.model.Quiz;
 import dk.au.mad21spring.AppProject.service.LocationService;
 import dk.au.mad21spring.AppProject.viewmodel.MapViewModel;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private Button QuizButton;
     private GoogleMap mMap;
@@ -120,13 +120,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         QuizButton.setEnabled(true);
         mMap.setOnMarkerClickListener(marker -> {
 
-            Intent intent = new Intent(MainActivity.this, ScoreActivity.class);
+            Intent intent = new Intent(MapActivity.this, ScoreActivity.class);
             intent.putExtra("quizId", marker.getSnippet());
 
             try {
-                MainActivity.this.startActivity(intent);
+                MapActivity.this.startActivity(intent);
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(MainActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
             }
 
             return false;
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (quiz == null) {
             Toast.makeText(this, getResources().getString(R.string.no_quizzes_near), Toast.LENGTH_SHORT).show();
         } else {
-            Intent intent = new Intent(MainActivity.this, QuizActivity.class);
+            Intent intent = new Intent(MapActivity.this, QuizActivity.class);
             intent.putExtra("quizId", quiz.getDocumentId());
 
             GoToQuizActivity(intent);
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void GoToQuizActivity(Intent intent) {
         try {
-            MainActivity.this.startActivity(intent);
+            MapActivity.this.startActivity(intent);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, getResources().getString(R.string.catch_error) + e, Toast.LENGTH_SHORT).show();
         }
